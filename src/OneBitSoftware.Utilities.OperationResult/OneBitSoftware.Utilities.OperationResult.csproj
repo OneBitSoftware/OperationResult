@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,7 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>OneBitSoftware.Utilities.OperationResult</PackageId>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/OneBitSoftware/OperationResult</RepositoryUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Company>OneBit Software</Company>
+    <Product>OneBit Software utilities - OperationResult</Product>
+    <Description>A reusable class for capturing multiple errors and success tracking when performing all kinds of code operations.</Description>
+    <Copyright>OneBit Software 2022</Copyright>
+    <PackageProjectUrl>https://github.com/OneBitSoftware/OperationResult</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>OneBitSoftware; OperationResult;</PackageTags>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
 
 </Project>

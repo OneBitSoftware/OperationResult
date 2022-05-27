@@ -210,6 +210,15 @@
     /// </summary>
     public class OperationResult<TResult> : OperationResult
     {
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OperationResult"/> class.
+        /// </summary>
+        /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
+        public OperationResult()
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OperationResult"/> class.
         /// </summary>
