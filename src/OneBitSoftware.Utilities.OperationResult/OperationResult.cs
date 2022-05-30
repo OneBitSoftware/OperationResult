@@ -65,13 +65,16 @@
         /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
         /// <param name="errorCode">The unique code of the error.</param>
         /// <param name="logLevel">The logging severity.</param>
-        public void AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
+        /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
+        public OperationResult AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
         {
             if (message is null) throw new ArgumentNullException(nameof(message));
             if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
             var error = new Error { Message = message,Code = errorCode };
             this.AppendError(error, logLevel);
+
+            return this;
         }
 
         /// <summary>
@@ -80,7 +83,8 @@
         /// <param name="debugMessage">A debug message that should be logged and provide additional information in debug mode.</param>
         /// <param name="errorCode">The unique code of the error.</param>
         /// <param name="logLevel">The logging severity.</param>
-        public void AppendErrorMessage(string message, int errorCode = 0, LogLevel? logLevel = null) => this.AppendError(message, errorCode, logLevel);
+        /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
+        public OperationResult AppendErrorMessage(string message, int errorCode = 0, LogLevel? logLevel = null) => this.AppendError(message, errorCode, logLevel);
 
         /// <summary>
         /// Appends an exception to the error message collection and logs the full exception as an Error <see cref="LogEventLevel"/> level. A call to this method will set the Success property to false.
@@ -88,7 +92,8 @@
         /// <param name="exception">The exception to log.</param>
         /// <param name="errorCode">The error code.</param>
         /// <param name="logLevel">The <see cref="LogEventLevel"/> logging severity.</param>
-        public void AppendException(Exception exception, int errorCode = 0, LogLevel? logLevel = null)
+        /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
+        public OperationResult AppendException(Exception exception, int errorCode = 0, LogLevel? logLevel = null)
         {
             if (exception is null) throw new ArgumentNullException(nameof(exception));
 
@@ -97,6 +102,8 @@
 
             var error = new Error { Message = exception.ToString(), Code = errorCode };
             this.AppendError(error, logLevel);
+
+            return this;
         }
 
         /// <summary>
@@ -210,7 +217,6 @@
     /// </summary>
     public class OperationResult<TResult> : OperationResult
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="OperationResult"/> class.
         /// </summary>
