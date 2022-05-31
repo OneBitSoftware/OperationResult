@@ -250,5 +250,33 @@
         /// Gets or sets the related object of the operation.
         /// </summary>
         public TResult? RelatedObject { get; set; }
+
+        /// <summary>
+        /// This method will append an error with a specific `user-friendly` message to this operation result instance.
+        /// </summary>
+        /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
+        /// <param name="errorCode">The unique code of the error.</param>
+        /// <param name="logLevel">The logging severity.</param>
+        /// <returns>The current instance of the <see cref="OperationResult{TResult}"/>.</returns>
+        public new OperationResult<TResult> AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
+        {
+            base.AppendError(message, errorCode, logLevel);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Appends an exception to the error message collection and logs the full exception as an Error <see cref="LogEventLevel"/> level. A call to this method will set the Success property to false.
+        /// </summary>
+        /// <param name="exception">The exception to log.</param>
+        /// <param name="errorCode">The error code.</param>
+        /// <param name="logLevel">The <see cref="LogEventLevel"/> logging severity.</param>
+        /// <returns>The current instance of the <see cref="OperationResult{TResult}"/>.</returns>
+        public new OperationResult<TResult> AppendException(Exception exception, int errorCode = 0, LogLevel? logLevel = null)
+        {
+            base.AppendException(exception, errorCode, logLevel);
+
+            return this;
+        }
     }
 }
