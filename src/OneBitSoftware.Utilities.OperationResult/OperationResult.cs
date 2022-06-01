@@ -1,6 +1,7 @@
 ﻿namespace OneBitSoftware.Utilities.OperationResult
 {
     using Microsoft.Extensions.Logging;
+    using OneBitSoftware.Utilities.OperationResult.Errors;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -10,7 +11,7 @@
     /// </summary>
     public class OperationResult
     {
-        private readonly List<Error> _errors = new();
+        private readonly List<OperationError> _errors = new();
         private readonly ILogger? _logger;
 
         /// <summary>
@@ -26,7 +27,7 @@
         /// <summary>
         /// Gets an <see cref="List{T}"/> containing the error codes and messages of the <see cref="OperationResult{T}" />.
         /// </summary>
-        public IReadOnlyCollection<Error> Errors => this._errors.AsReadOnly();
+        public IReadOnlyCollection<OperationError> Errors => this._errors.AsReadOnly();
 
         /// <summary>
         /// Gets or sets the first exception that resulted from the operation.
@@ -71,7 +72,7 @@
             if (message is null) throw new ArgumentNullException(nameof(message));
             if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
-            var error = new Error { Message = message,Code = errorCode };
+            var error = new OperationError(message, errorCode);
             this.AppendError(error, logLevel);
 
             return this;
@@ -100,7 +101,7 @@
             // Append the exception as a first if it is not yet set.
             this.InitialException ??= exception;
 
-            var error = new Error { Message = exception.ToString(), Code = errorCode };
+            var error = new OperationError(exception.ToString(), errorCode);
             this.AppendError(error, logLevel);
 
             return this;
@@ -199,7 +200,7 @@
 
         private static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
 
-        private void AppendError(Error error, LogLevel? logLevel)
+        private void AppendError(OperationError error, LogLevel? logLevel)
         {
             this.AppendError(error);
 
@@ -209,7 +210,7 @@
             }
         }
 
-        private void AppendError(Error error) => this._errors.Add(error);
+        private void AppendError(OperationError error) => this._errors.Add(error);
     }
 
     /// <summary>
