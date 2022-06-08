@@ -12,6 +12,8 @@
     public class OperationResult
     {
         private readonly List<OperationError> _errors = new();
+        private readonly List<string> _successMessages = new();
+
         private readonly ILogger? _logger;
 
         /// <summary>
@@ -23,6 +25,17 @@
         /// Gets a value indicating whether the operation has failed.
         /// </summary>
         public bool Fail => this.Errors.Any();
+
+        /// <summary>
+        /// A collection of optional success messages that can be used to process positive operation result messages.
+        /// </summary>
+        public IEnumerable<string> SuccessMessages
+        {
+            get
+            {
+                return _successMessages;
+            }
+        }
 
         /// <summary>
         /// Gets an <see cref="List{T}"/> containing the error codes and messages of the <see cref="OperationResult{T}" />.
@@ -50,6 +63,18 @@
         public OperationResult(ILogger loggerService)
         {
             this._logger = loggerService;
+        }
+
+        /// <summary>
+        /// Adds a success message to the internal collection.
+        /// </summary>
+        /// <param name="message">The message to add.</param>
+        public void AddSuccessMessage(string message)
+        {
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                this._successMessages.Add(message);
+            }
         }
 
         public void AppendErrors(OperationResult otherOperationResult)
