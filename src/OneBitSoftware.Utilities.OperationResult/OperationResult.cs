@@ -241,8 +241,17 @@
         /// <param name="resultObject">An initial failure message for the operation result. This will fail the success status.</param>
         /// <param name="loggerService">An instance of <see cref="ILoggerService"/>.</param>
         /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
-        public OperationResult(ILogger loggerService, TResult resultObject)
-            : base(loggerService)
+        public OperationResult(TResult resultObject, ILogger loggerService) : base(loggerService)
+        {
+            this.RelatedObject = resultObject;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OperationResult"/> class and sets the passed result object. Internally, this will set the Success result to True.
+        /// </summary>
+        /// <param name="resultObject">An initial failure message for the operation result. This will fail the success status.</param>
+        /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
+        public OperationResult(TResult resultObject) : base()
         {
             this.RelatedObject = resultObject;
         }
