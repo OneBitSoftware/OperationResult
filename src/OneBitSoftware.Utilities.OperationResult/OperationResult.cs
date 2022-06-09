@@ -1,10 +1,10 @@
-﻿namespace OneBitSoftware.Utilities.OperationResult
+﻿namespace OneBitSoftware.Utilities
 {
-    using Microsoft.Extensions.Logging;
-    using OneBitSoftware.Utilities.OperationResult.Errors;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Microsoft.Extensions.Logging;
+    using OneBitSoftware.Utilities.Errors;
 
     /// <summary>
     /// A class for a system operation result.
@@ -82,7 +82,7 @@
             if (otherOperationResult is null) return;
 
             // Append the error message without logging (presuming that there is already a log message).
-            foreach (var error in otherOperationResult.Errors) this.AppendError(error);
+            foreach (var error in otherOperationResult.Errors) this.AppendErrorInternal(error);
         }
 
         /// <summary>
@@ -133,91 +133,6 @@
         }
 
         /// <summary>
-        /// Use this method to check if a value is a valid string.
-        /// If <paramref name="value"/> is null, empty or consists only of whitespace characters, an error message should be appended and a log of the passed <paramref name="level"/> severity would be created.
-        /// </summary>
-        /// <param name="value">The value that should be validated.</param>
-        /// <param name="className">The name of the class where the <paramref name="methodName"/> is defined.</param>
-        /// <param name="methodName">The name of he method where <paramref name="value"/> is used.</param>
-        /// <param name="propertyName">The name of the property.</param>
-        /// <param name="level">The logging severity.</param>
-        public void ValidateNullOrWhitespace(string value, string className, string methodName, string propertyName, LogLevel level = LogLevel.Error)
-        {
-            // If the passed value is null, empty or consists only of whitespace characters, log and append an error message.
-            if (string.IsNullOrWhiteSpace(value) == false) return;
-
-            var errorMessage = $"{className}, {methodName} - The {propertyName} is null, empty or consists only of whitespace characters.";
-            this.AppendErrorMessage(errorMessage, logLevel: level);
-        }
-
-        /// <summary>
-        /// Use this method to check if a value is not null.
-        /// If you want to validate that an entity exists, use the "ValidateExist" extension method.
-        /// If you want to validate that the currently authenticated user is not null, use the "ValidateUser" extension method.
-        /// If <paramref name="value"/> is null, an error message should be appended and a log of the passed <paramref name="level"/> severity would be created.
-        /// </summary>
-        /// <param name="value">The value that should be validated.</param>
-        /// <param name="className">The name of the class where the <paramref name="methodName"/> is defined.</param>
-        /// <param name="methodName">The name of he method where <paramref name="value"/> is used.</param>
-        /// <param name="propertyName">The name of the property.</param>
-        /// <param name="level">The logging severity.</param>
-        public void ValidateNull(object value, string className, string methodName, string propertyName, LogLevel level = LogLevel.Error)
-        {
-            // If the passed value is null, log and append an error message.
-            if (value != null) return;
-
-            var errorMessage = $"{className}, {methodName} - The {propertyName} is null.";
-            this.AppendErrorMessage(errorMessage, logLevel: level);
-        }
-
-        /// <summary>
-        /// Use this method to check if a value is equal to its default value.
-        /// If <paramref name="value"/> is equal to its default value, an error message should be appended and a log of the passed <paramref name="level"/> severity would be created.
-        /// </summary>
-        /// <typeparam name="TValue">The type of the <paramref name="value"/>.</typeparam>
-        /// <param name="value">The value that should be validated.</param>
-        /// <param name="className">The name of the class where the <paramref name="methodName"/> is defined.</param>
-        /// <param name="methodName">The name of he method where <paramref name="value"/> is used.</param>
-        /// <param name="propertyName">The name of the property.</param>
-        /// <param name="level">The logging severity.</param>
-        public void ValidateDefault<TValue>(TValue value, string className, string methodName, string propertyName, LogLevel level = LogLevel.Error)
-            where TValue : struct, IEquatable<TValue>
-        {
-            // If the passed value is null, log and append an error message.
-            if (value.Equals(default) == false) return;
-
-            var errorMessage = $"{className}, {methodName} - The {propertyName} has a default value.";
-            this.AppendErrorMessage(errorMessage, logLevel: level);
-        }
-
-        /// <summary>
-        /// Use this method to check if a value is not null and not an empty collection.
-        /// If <paramref name="value"/> is null or an empty collection, an error message should be appended and a log of the passed <paramref name="level"/> severity would be created.
-        /// </summary>
-        /// <typeparam name="T">The type of the underlying entities that are stored within the requested collection.</typeparam>
-        /// <param name="value">The collection that should be validated.</param>
-        /// <param name="className">The name of the class where the <paramref name="methodName"/> is defined.</param>
-        /// <param name="methodName">The name of he method where <paramref name="value"/> is used.</param>
-        /// <param name="identifierPropertyName">The name of the entity's unique identifier property.</param>
-        /// <param name="level">The logging severity.</param>
-        public void ValidateAny<T>(IEnumerable<T> value, string className, string methodName, string identifierPropertyName, LogLevel level = LogLevel.Error)
-        {
-            // If the passed value is null, log and append an error message.
-            if (value == null)
-            {
-                var errorMessage = $"{className}, {methodName} - An object with that {identifierPropertyName} is null.";
-                this.AppendErrorMessage(errorMessage, logLevel: level);
-            }
-
-            // If the passed value is an empty collection, log and append an error message.
-            else if (!value.Any())
-            {
-                var errorMessage = $"{className}, {methodName} - The collection with that {identifierPropertyName} is empty.";
-                this.AppendErrorMessage(errorMessage, logLevel: level);
-            }
-        }
-
-        /// <summary>
         /// Use this method to get a string with all error messages.
         /// </summary>
         /// <returns>All error messages, joined with a new line character.</returns>
@@ -227,15 +142,21 @@
 
         private void AppendError(OperationError error, LogLevel? logLevel)
         {
-            this.AppendError(error);
+            this.AppendErrorInternal(error);
 
             if (this._logger is not null)
             {
+#pragma warning disable CA2254 // Template should be a static expression
                 this._logger.Log(GetLogLevel(logLevel), error.Message);
+#pragma warning restore CA2254 // Template should be a static expression
             }
         }
 
-        private void AppendError(OperationError error) => this._errors.Add(error);
+        /// <summary>
+        /// Appends an <see cref="OperationError"/> to the internal Errors collection.
+        /// </summary>
+        /// <param name="error"></param>
+        private void AppendErrorInternal(OperationError error) => this._errors.Add(error);
     }
 
     /// <summary>
@@ -296,6 +217,22 @@
         public new OperationResult<TResult> AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
         {
             base.AppendError(message, errorCode, logLevel);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Appends error messages from <paramref name="otherOperationResult"/> to <paramref name="originalOperationResult"/>.
+        /// </summary>
+        /// <param name="originalOperationResult">The <see cref="OperationResult"/> to append to.</param>
+        /// <param name="otherOperationResult">The <see cref="OperationResult"/> to append from.</param>
+        /// <typeparam name="TOriginal">A type that inherits from <see cref="OperationResult"/>.</typeparam>
+        /// <typeparam name="TOther">A type that inherits from <see cref="OperationResult"/>.</typeparam>
+        /// <returns>The original <see cref="OperationResult"/> with the appended messages from <paramref name="otherOperationResult"/>.</returns>
+        public OperationResult<TResult> AppendErrorMessages<TOther>(TOther otherOperationResult)
+            where TOther : OperationResult
+        {
+            base.AppendErrors(otherOperationResult);
 
             return this;
         }

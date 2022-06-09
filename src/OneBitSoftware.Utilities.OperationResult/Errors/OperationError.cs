@@ -1,4 +1,4 @@
-﻿namespace OneBitSoftware.Utilities.OperationResult.Errors;
+﻿namespace OneBitSoftware.Utilities.Errors;
 
 using System.Text;
 
