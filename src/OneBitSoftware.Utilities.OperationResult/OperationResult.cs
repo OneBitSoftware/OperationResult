@@ -140,7 +140,12 @@
 
         private static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
 
-        private void AppendError(OperationError error, LogLevel? logLevel)
+        /// <summary>
+        /// Appends an <see cref="OperationError"/> to the internal errors collection.
+        /// </summary>
+        /// <param name="error"></param>
+        /// <param name="logLevel"></param>
+        public void AppendError(OperationError error, LogLevel? logLevel)
         {
             this.AppendErrorInternal(error);
 
