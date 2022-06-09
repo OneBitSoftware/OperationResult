@@ -31,7 +31,7 @@
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>OneBitSoftware; OperationResult;</PackageTags>
-    <Version>1.0.5</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
 </Project>
