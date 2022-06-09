@@ -145,7 +145,7 @@
         /// </summary>
         /// <param name="error"></param>
         /// <param name="logLevel"></param>
-        public void AppendError(OperationError error, LogLevel? logLevel)
+        public void AppendError(OperationError error, LogLevel? logLevel = LogLevel.Error)
         {
             this.AppendErrorInternal(error);
 
