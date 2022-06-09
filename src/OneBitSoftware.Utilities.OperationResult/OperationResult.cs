@@ -189,7 +189,7 @@
         /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
         public OperationResult(TResult resultObject, ILogger loggerService) : base(loggerService)
         {
-            this.RelatedObject = resultObject;
+            this.ResultObject = resultObject;
         }
 
         /// <summary>
@@ -199,13 +199,13 @@
         /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
         public OperationResult(TResult resultObject) : base()
         {
-            this.RelatedObject = resultObject;
+            this.ResultObject = resultObject;
         }
 
         /// <summary>
         /// Gets or sets the related object of the operation.
         /// </summary>
-        public TResult? RelatedObject { get; set; }
+        public TResult? ResultObject { get; set; }
 
         /// <summary>
         /// This method will append an error with a specific `user-friendly` message to this operation result instance.
