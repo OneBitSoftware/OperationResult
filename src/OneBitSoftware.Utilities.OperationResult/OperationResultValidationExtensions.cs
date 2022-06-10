@@ -51,7 +51,7 @@ public static class OperationResultValidationExtensions
         if (value.Equals(default) == false) return;
 
         var errorMessage = $"{className}, {methodName} - The {propertyName} has a default value.";
-        operationResult.AppendErrorMessage(errorMessage, logLevel: level);
+        operationResult.AppendError(errorMessage, logLevel: level);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public static class OperationResultValidationExtensions
         if (string.IsNullOrWhiteSpace(value) == false) return;
 
         var errorMessage = $"{className}, {methodName} - The {propertyName} is null, empty or consists only of whitespace characters.";
-        operationResult.AppendErrorMessage(errorMessage, logLevel: level);
+        operationResult.AppendError(errorMessage, logLevel: level);
     }
 
     /// <summary>
@@ -91,6 +91,6 @@ public static class OperationResultValidationExtensions
         if (value != null) return;
 
         var errorMessage = $"{className}, {methodName} - The {propertyName} is null.";
-        operationResult.AppendErrorMessage(errorMessage, logLevel: level);
+        operationResult.AppendError(errorMessage, logLevel: level);
     }
 }

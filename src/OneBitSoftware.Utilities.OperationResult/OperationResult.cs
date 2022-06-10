@@ -102,7 +102,6 @@ public class OperationResult
     /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
     public OperationResult AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
     {
-        if (message is null) throw new ArgumentNullException(nameof(message));
         if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
         var error = new OperationError(message, errorCode);
@@ -110,15 +109,6 @@ public class OperationResult
 
         return this;
     }
-
-    /// <summary>
-    /// Appends an error message to the operation result instance.
-    /// </summary>
-    /// <param name="message">The message that should be appended.</param>
-    /// <param name="errorCode">The unique code of the error.</param>
-    /// <param name="logLevel">The logging severity.</param>
-    /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-    public OperationResult AppendErrorMessage(string message, int errorCode = 0, LogLevel? logLevel = null) => this.AppendError(message, errorCode, logLevel);
 
     /// <summary>
     /// Appends an exception to the error message collection and logs the full exception as an Error <see cref="LogEventLevel"/> level. A call to this method will set the Success property to false.
