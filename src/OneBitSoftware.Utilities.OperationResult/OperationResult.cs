@@ -97,14 +97,15 @@ public class OperationResult
     /// This method will append an error with a specific `user-friendly` message to this operation result instance.
     /// </summary>
     /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
-    /// <param name="errorCode">The unique code of the error.</param>
+    /// <param name="code">The unique code of the error.</param>
     /// <param name="logLevel">The logging severity.</param>
+    /// <param name="details">A <see cref="string"/> with error details.</param>
     /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-    public OperationResult AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
+    public OperationResult AppendError(string message, int? code = null, LogLevel? logLevel = null, string? details = null)
     {
         if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
-        var error = new OperationError(message, errorCode);
+        var error = new OperationError(message, code) { Details = details };
         this.AppendError(error, logLevel);
 
         return this;
@@ -219,12 +220,13 @@ public class OperationResult<TResult> : OperationResult
     /// This method will append an error with a specific `user-friendly` message to this operation result instance.
     /// </summary>
     /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
-    /// <param name="errorCode">The unique code of the error.</param>
+    /// <param name="code">The unique code of the error.</param>
     /// <param name="logLevel">The logging severity.</param>
+    /// <param name="details">A <see cref="string"/> with error details.</param>
     /// <returns>The current instance of the <see cref="OperationResult{TResult}"/>.</returns>
-    public new OperationResult<TResult> AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
+    public new OperationResult<TResult> AppendError(string message, int? code = null, LogLevel? logLevel = null, string? details = null)
     {
-        base.AppendError(message, errorCode, logLevel);
+        base.AppendError(message, code, logLevel, details);
 
         return this;
     }
