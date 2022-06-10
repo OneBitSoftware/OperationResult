@@ -19,5 +19,21 @@ namespace OneBitSoftware.Utilities.OperationResultTests
 
             Assert.NotNull(sut);
         }
+
+        [Fact]
+        public void NewOperationResultT_ShouldNotBeNull()
+        {
+            var sut = new OperationResult<object>();
+
+            Assert.NotNull(sut);
+        }
+
+        [Fact]
+        public void NewOperationResultTWithNullLogger_ShouldSucceed()
+        {
+            var sut = new OperationResult<object>(null);
+
+            Assert.NotNull(sut);
+        }
     }
 }
