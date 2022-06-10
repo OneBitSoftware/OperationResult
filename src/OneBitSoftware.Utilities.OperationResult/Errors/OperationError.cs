@@ -4,12 +4,7 @@ using System.Text;
 
 public class OperationError
 {
-    public OperationError(string message)
-    {
-        this.Message = message;
-    }
-
-    public OperationError(string message, int code)
+    public OperationError(string message, int? code = null)
     {
         this.Message = message;
         this.Code = code;
