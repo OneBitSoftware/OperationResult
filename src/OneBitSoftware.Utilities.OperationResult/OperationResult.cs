@@ -111,6 +111,26 @@ public class OperationResult
     }
 
     /// <summary>
+    /// Appends an <see cref="OperationError"/> to the internal errors collection.
+    /// </summary>
+    /// <param name="error">An instance of <see cref="OperationError"/> to add to the internal errors collection.</param>
+    /// <param name="logLevel">The logging level.</param>
+    /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
+    public OperationResult AppendError(OperationError error, LogLevel? logLevel = LogLevel.Error)
+    {
+        this.AppendErrorInternal(error);
+
+        if (this._logger is not null)
+        {
+#pragma warning disable CA2254 // Template should be a static expression
+            this._logger.Log(GetLogLevel(logLevel), error.Message);
+#pragma warning restore CA2254 // Template should be a static expression
+        }
+
+        return this;
+    }
+
+    /// <summary>
     /// Appends an exception to the error message collection and logs the full exception as an Error <see cref="LogEventLevel"/> level. A call to this method will set the Success property to false.
     /// </summary>
     /// <param name="exception">The exception to log.</param>
@@ -138,26 +158,6 @@ public class OperationResult
 
     // TODO: this method needs completing.
     private static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
-
-    /// <summary>
-    /// Appends an <see cref="OperationError"/> to the internal errors collection.
-    /// </summary>
-    /// <param name="error">An instance of <see cref="OperationError"/> to add to the internal errors collection.</param>
-    /// <param name="logLevel">The logging level.</param>
-    /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-    public OperationResult AppendError(OperationError error, LogLevel? logLevel = LogLevel.Error)
-    {
-        this.AppendErrorInternal(error);
-
-        if (this._logger is not null)
-        {
-#pragma warning disable CA2254 // Template should be a static expression
-            this._logger.Log(GetLogLevel(logLevel), error.Message);
-#pragma warning restore CA2254 // Template should be a static expression
-        }
-
-        return this;
-    }
 
     /// <summary>
     /// Appends an <see cref="OperationError"/> to the internal errors collection.
