@@ -97,28 +97,39 @@ public class OperationResult
     /// This method will append an error with a specific `user-friendly` message to this operation result instance.
     /// </summary>
     /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
-    /// <param name="errorCode">The unique code of the error.</param>
+    /// <param name="code">The unique code of the error.</param>
     /// <param name="logLevel">The logging severity.</param>
+    /// <param name="details">A <see cref="string"/> with error details.</param>
     /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-    public OperationResult AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
+    public OperationResult AppendError(string message, int? code = null, LogLevel? logLevel = null, string? details = null)
     {
-        if (message is null) throw new ArgumentNullException(nameof(message));
         if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
-        var error = new OperationError(message, errorCode);
+        var error = new OperationError(message, code) { Details = details };
         this.AppendError(error, logLevel);
 
         return this;
     }
 
     /// <summary>
-    /// Appends an error message to the operation result instance.
+    /// Appends an <see cref="OperationError"/> to the internal errors collection.
     /// </summary>
-    /// <param name="message">The message that should be appended.</param>
-    /// <param name="errorCode">The unique code of the error.</param>
-    /// <param name="logLevel">The logging severity.</param>
+    /// <param name="error">An instance of <see cref="OperationError"/> to add to the internal errors collection.</param>
+    /// <param name="logLevel">The logging level.</param>
     /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-    public OperationResult AppendErrorMessage(string message, int errorCode = 0, LogLevel? logLevel = null) => this.AppendError(message, errorCode, logLevel);
+    public OperationResult AppendError(OperationError error, LogLevel? logLevel = LogLevel.Error)
+    {
+        this.AppendErrorInternal(error);
+
+        if (this._logger is not null)
+        {
+#pragma warning disable CA2254 // Template should be a static expression
+            this._logger.Log(GetLogLevel(logLevel), error.Message);
+#pragma warning restore CA2254 // Template should be a static expression
+        }
+
+        return this;
+    }
 
     /// <summary>
     /// Appends an exception to the error message collection and logs the full exception as an Error <see cref="LogEventLevel"/> level. A call to this method will set the Success property to false.
@@ -148,26 +159,6 @@ public class OperationResult
 
     // TODO: this method needs completing.
     private static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
-
-    /// <summary>
-    /// Appends an <see cref="OperationError"/> to the internal errors collection.
-    /// </summary>
-    /// <param name="error">An instance of <see cref="OperationError"/> to add to the internal errors collection.</param>
-    /// <param name="logLevel">The logging level.</param>
-    /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-    public OperationResult AppendError(OperationError error, LogLevel? logLevel = LogLevel.Error)
-    {
-        this.AppendErrorInternal(error);
-
-        if (this._logger is not null)
-        {
-#pragma warning disable CA2254 // Template should be a static expression
-            this._logger.Log(GetLogLevel(logLevel), error.Message);
-#pragma warning restore CA2254 // Template should be a static expression
-        }
-
-        return this;
-    }
 
     /// <summary>
     /// Appends an <see cref="OperationError"/> to the internal errors collection.
@@ -229,12 +220,13 @@ public class OperationResult<TResult> : OperationResult
     /// This method will append an error with a specific `user-friendly` message to this operation result instance.
     /// </summary>
     /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
-    /// <param name="errorCode">The unique code of the error.</param>
+    /// <param name="code">The unique code of the error.</param>
     /// <param name="logLevel">The logging severity.</param>
+    /// <param name="details">A <see cref="string"/> with error details.</param>
     /// <returns>The current instance of the <see cref="OperationResult{TResult}"/>.</returns>
-    public new OperationResult<TResult> AppendError(string message, int errorCode = 0, LogLevel? logLevel = null)
+    public new OperationResult<TResult> AppendError(string message, int? code = null, LogLevel? logLevel = null, string? details = null)
     {
-        base.AppendError(message, errorCode, logLevel);
+        base.AppendError(message, code, logLevel, details);
 
         return this;
     }
