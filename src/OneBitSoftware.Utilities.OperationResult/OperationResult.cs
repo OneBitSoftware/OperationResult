@@ -59,11 +59,14 @@ public class OperationResult
     /// <summary>
     /// Initializes a new instance of the <see cref="OperationResult"/> class.
     /// </summary>
-    /// <param name="loggerService">An instance of <see cref="ILogger"/> to use for automatic logging.</param>
+    /// <param name="logger">An instance of <see cref="ILogger"/> to use for automatic logging.</param>
     /// <remarks>If the operation is a get operation, an empty result (no results) must return a truthy Success value.</remarks>
-    public OperationResult(ILogger loggerService)
+    public OperationResult(ILogger? logger)
     {
-        this._logger = loggerService;
+        if (logger is not null)
+        {
+            this._logger = logger; 
+        }
     }
 
     /// <summary>
@@ -156,6 +159,33 @@ public class OperationResult
     /// </summary>
     /// <returns>All error messages, joined with a new line character.</returns>
     public override string ToString() => string.Join(Environment.NewLine, this.Errors);
+
+    /// <summary>
+    /// Creates an instance of <see cref="OperationResult"/> and appends the passed exception to it's error collection.
+    /// </summary>
+    /// <param name="exception">The <see cref="Exception"/> to append.</param>
+    /// <param name="logger">An optional instance of <see cref="ILogger"/>.</param>
+    /// <returns>An <see cref="OperationResult"/> containing the passed exception.</returns>
+    public static OperationResult FromException(Exception exception, ILogger? logger = null)
+    {
+        var result = new OperationResult(logger);
+        return result.AppendException(exception);
+    }
+
+    /// <summary>
+    /// Creates an instance of <see cref="OperationResult"/> and appends the passed error message details to it's internal error collection.
+    /// </summary>
+    /// <param name="message">A message to append to the internal errors collection.</param>
+    /// <param name="code">An optional code to include in the error.</param>
+    /// <param name="logLevel">A log event level. Defaults to Error.</param>
+    /// <param name="details">An optional detail message to add to the error.</param>
+    /// <param name="logger">An optional instance of <see cref="ILogger"/>.</param>
+    /// <returns>An <see cref="OperationResult"/> containing the passed exception.</returns>
+    public static OperationResult FromError(string message, int? code = null, LogLevel logLevel = LogLevel.Error, string? details = null, ILogger? logger = null)
+    {
+        var result = new OperationResult(logger);
+        return result.AppendError(message, code, logLevel, details);
+    }
 
     // TODO: this method needs completing.
     private static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
