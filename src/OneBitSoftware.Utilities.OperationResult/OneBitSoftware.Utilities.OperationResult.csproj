@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageId>OneBitSoftware.Utilities.OperationResult</PackageId>
+	  <Authors>OneBit Software</Authors>
+	  <PackageId>OneBitSoftware.Utilities.OperationResult</PackageId>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/OneBitSoftware/OperationResult</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -31,7 +32,7 @@
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>OneBitSoftware; OperationResult;</PackageTags>
-    <Version>1.1.6</Version>
+    <Version>1.1.7</Version>
   </PropertyGroup>
 
 </Project>

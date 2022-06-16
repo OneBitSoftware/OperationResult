@@ -2,12 +2,13 @@
 
 using System.Text;
 
-public class OperationError
+public class OperationError : IOperationError
 {
-    public OperationError(string message, int? code = null)
+    public OperationError(string message, int? code = null, string? details = null)
     {
         this.Message = message;
         this.Code = code;
+        this.Details = details;
     }
 
     public int? Code { get; set; }

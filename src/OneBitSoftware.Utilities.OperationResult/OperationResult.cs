@@ -12,7 +12,7 @@ using OneBitSoftware.Utilities.Errors;
 /// </summary>
 public class OperationResult
 {
-    private readonly List<OperationError> _errors = new();
+    private readonly List<IOperationError> _errors = new();
     private readonly List<string> _successMessages = new();
 
     private readonly ILogger? _logger;
@@ -41,7 +41,7 @@ public class OperationResult
     /// <summary>
     /// Gets an <see cref="List{T}"/> containing the error codes and messages of the <see cref="OperationResult{T}" />.
     /// </summary>
-    public IReadOnlyCollection<OperationError> Errors => this._errors.AsReadOnly();
+    public IReadOnlyCollection<IOperationError> Errors => this._errors.AsReadOnly();
 
     /// <summary>
     /// Gets or sets the first exception that resulted from the operation.
@@ -97,7 +97,7 @@ public class OperationResult
     }
 
     /// <summary>
-    /// This method will append an error with a specific `user-friendly` message to this operation result instance.
+    /// This method will append an <see cref="OperationError"/> error with a specific `user-friendly` message to this operation result instance.
     /// </summary>
     /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
     /// <param name="code">The unique code of the error.</param>
@@ -115,12 +115,32 @@ public class OperationResult
     }
 
     /// <summary>
-    /// Appends an <see cref="OperationError"/> to the internal errors collection.
+    /// This method will append an <typeparamref name="T"/> error with a specific `user-friendly` message to this operation result instance.
     /// </summary>
-    /// <param name="error">An instance of <see cref="OperationError"/> to add to the internal errors collection.</param>
+    /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
+    /// <param name="code">The unique code of the error.</param>
+    /// <param name="logLevel">The logging severity.</param>
+    /// <param name="details">A <see cref="string"/> with error details.</param>
+    /// <typeparam name="T">The type of <see cref="IOperationError"/> to append.</typeparam>
+    /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
+    public OperationResult AppendError<T>(string message, int? code = null, LogLevel? logLevel = null, string? details = null)
+        where T : IOperationError, new()
+    {
+        if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
+
+        var error = new T() { Message = message, Code = code, Details = details };
+        this.AppendError(error, logLevel);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Appends an <see cref="IOperationError"/> to the internal errors collection.
+    /// </summary>
+    /// <param name="error">An instance of <see cref="IOperationError"/> to add to the internal errors collection.</param>
     /// <param name="logLevel">The logging level.</param>
     /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-    public OperationResult AppendError(OperationError error, LogLevel? logLevel = LogLevel.Error)
+    public OperationResult AppendError(IOperationError error, LogLevel? logLevel = LogLevel.Error)
     {
         this.AppendErrorInternal(error);
 
@@ -191,10 +211,10 @@ public class OperationResult
     private static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
 
     /// <summary>
-    /// Appends an <see cref="OperationError"/> to the internal errors collection.
+    /// Appends an <see cref="IOperationError"/> to the internal errors collection.
     /// </summary>
-    /// <param name="error">An instance of <see cref="OperationError"/> to add to the internal errors collection.</param>
-    private void AppendErrorInternal(OperationError error) => this._errors.Add(error);
+    /// <param name="error">An instance of <see cref="IOperationError"/> to add to the internal errors collection.</param>
+    private void AppendErrorInternal(IOperationError error) => this._errors.Add(error);
 }
 
 /// <summary>
