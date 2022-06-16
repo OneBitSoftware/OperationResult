@@ -15,7 +15,7 @@ public class OperationResult
     private readonly List<IOperationError> _errors = new();
     private readonly List<string> _successMessages = new();
 
-    private readonly ILogger? _logger;
+    protected readonly ILogger? _logger;
 
     /// <summary>
     /// Gets or sets a value indicating whether the operation is successful or not.
@@ -208,13 +208,13 @@ public class OperationResult
     }
 
     // TODO: this method needs completing.
-    private static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
+    protected static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
 
     /// <summary>
     /// Appends an <see cref="IOperationError"/> to the internal errors collection.
     /// </summary>
     /// <param name="error">An instance of <see cref="IOperationError"/> to add to the internal errors collection.</param>
-    private void AppendErrorInternal(IOperationError error) => this._errors.Add(error);
+    protected void AppendErrorInternal(IOperationError error) => this._errors.Add(error);
 }
 
 /// <summary>
@@ -234,9 +234,9 @@ public class OperationResult<TResult> : OperationResult
     /// <summary>
     /// Initializes a new instance of the <see cref="OperationResult"/> class.
     /// </summary>
-    /// <param name="loggerService">An instance of <see cref="ILoggerService"/>.</param>
+    /// <param name="logger">An instance of <see cref="ILoggerService"/>.</param>
     /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
-    public OperationResult(ILogger loggerService) : base(loggerService)
+    public OperationResult(ILogger logger) : base(logger)
     {
     }
 
@@ -244,9 +244,9 @@ public class OperationResult<TResult> : OperationResult
     /// Initializes a new instance of the <see cref="OperationResult"/> class and sets the passed result object. Internally, this will set the Success result to True.
     /// </summary>
     /// <param name="resultObject">An initial failure message for the operation result. This will fail the success status.</param>
-    /// <param name="loggerService">An instance of <see cref="ILoggerService"/>.</param>
+    /// <param name="logger">An instance of <see cref="ILogger"/>.</param>
     /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
-    public OperationResult(TResult resultObject, ILogger loggerService) : base(loggerService)
+    public OperationResult(TResult resultObject, ILogger logger) : base(logger)
     {
         this.ResultObject = resultObject;
     }
@@ -277,6 +277,26 @@ public class OperationResult<TResult> : OperationResult
     public new OperationResult<TResult> AppendError(string message, int? code = null, LogLevel? logLevel = null, string? details = null)
     {
         base.AppendError(message, code, logLevel, details);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Appends an <see cref="IOperationError"/> to the internal errors collection.
+    /// </summary>
+    /// <param name="error">An instance of <see cref="IOperationError"/> to add to the internal errors collection.</param>
+    /// <param name="logLevel">The logging level.</param>
+    /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
+    public OperationResult<TResult> AppendError(IOperationError error, LogLevel? logLevel = LogLevel.Error)
+    {
+        base.AppendErrorInternal(error);
+
+        if (this._logger is not null)
+        {
+#pragma warning disable CA2254 // Template should be a static expression
+            this._logger.Log(GetLogLevel(logLevel), error.Message);
+#pragma warning restore CA2254 // Template should be a static expression
+        }
 
         return this;
     }
