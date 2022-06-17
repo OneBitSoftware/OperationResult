@@ -38,7 +38,7 @@ public class OperationResultConstructorTests
     [Fact]
     public void NewOperationResultTWithNullLogger_ShouldSucceed()
     {
-        var sut = new OperationResult<object>(null);
+        var sut = new OperationResult<object>(logger: null);
 
         Assert.NotNull(sut);
         Assert.True(sut.Success);
@@ -73,9 +73,9 @@ public class OperationResultConstructorTests
         Assert.NotNull(result);
         Assert.False(result.Success);
         Assert.True(result.Fail);
-        Assert.True(result.Errors.Any(e => e.Code.Equals(errorCode)));
-        Assert.True(result.Errors.Any(e => e.Message.Equals(message)));
-        Assert.True(result.Errors.Any(e => e.Details != null && e.Details.Equals(detail)));
+        Assert.Contains(result.Errors, e => e.Code.Equals(errorCode));
+        Assert.Contains(result.Errors, e => e.Message.Equals(message));
+        Assert.Contains(result.Errors, e => e.Details != null && e.Details.Equals(detail));
         Assert.Equal(1, result.Errors.Count);
     }
 
@@ -89,9 +89,9 @@ public class OperationResultConstructorTests
         Assert.NotNull(result);
         Assert.False(result.Success);
         Assert.True(result.Fail);
-        Assert.True(result.Errors.Any(e => e.Code.Equals(errorCode)));
-        Assert.True(result.Errors.Any(e => e.Message.Equals(message)));
-        Assert.True(result.Errors.Any(e => e.Details != null && e.Details.Equals(detail)));
+        Assert.Contains(result.Errors, e => e.Code.Equals(errorCode));
+        Assert.Contains(result.Errors, e => e.Message.Equals(message));
+        Assert.Contains(result.Errors, e => e.Details != null && e.Details.Equals(detail));
         Assert.Equal(1, result.Errors.Count);
     }
 }

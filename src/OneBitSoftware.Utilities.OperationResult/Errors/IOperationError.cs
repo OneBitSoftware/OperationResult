@@ -1,10 +1,11 @@
-﻿namespace OneBitSoftware.Utilities.Errors;
-
-public interface IOperationError
+﻿namespace OneBitSoftware.Utilities.Errors
 {
-    int? Code { get; set; }
+    public interface IOperationError
+    {
+        int? Code { get; set; }
 
-    string Message { get; set; }
+        string Message { get; set; }
 
-    string? Details { get; set; }
+        string? Details { get; set; }
+    }
 }

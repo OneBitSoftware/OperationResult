@@ -1,32 +1,34 @@
-﻿namespace OneBitSoftware.Utilities.Errors;
-
-using System.Text;
-
-public class OperationError : IOperationError
+﻿namespace OneBitSoftware.Utilities.Errors
 {
-    public OperationError(string message, int? code = null, string? details = null)
+    using System.Text;
+
+    public class OperationError : IOperationError
     {
-        this.Message = message;
-        this.Code = code;
-        this.Details = details;
+        public OperationError(string message, int? code = null, string? details = null)
+        {
+            this.Message = message;
+            this.Code = code;
+            this.Details = details;
+        }
+
+        public int? Code { get; set; }
+
+        public string Message { get; set; }
+
+        public string? Details { get; set; }
+
+        public override string ToString()
+        {
+            var result = new StringBuilder();
+
+            if (this.Code != null) result.AppendLine($"Code: {this.Code}");
+
+            if (!string.IsNullOrWhiteSpace(this.Message)) result.AppendLine($"Message: {this.Message}");
+
+            if (!string.IsNullOrWhiteSpace(this.Details)) result.AppendLine($"Trace: {this.Details}");
+
+            return result.ToString();
+        }
     }
 
-    public int? Code { get; set; }
-
-    public string Message { get; set; }
-
-    public string? Details { get; set; }
-
-    public override string ToString()
-    {
-        var result = new StringBuilder();
-
-        if (this.Code != null) result.AppendLine($"Code: {this.Code}");
-
-        if (!string.IsNullOrWhiteSpace(this.Message)) result.AppendLine($"Message: {this.Message}");
-
-        if (!string.IsNullOrWhiteSpace(this.Details)) result.AppendLine($"Trace: {this.Details}");
-
-        return result.ToString();
-    }
 }
