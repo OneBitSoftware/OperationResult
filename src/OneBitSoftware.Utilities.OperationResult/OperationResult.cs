@@ -264,7 +264,7 @@
         /// <summary>
         /// Gets or sets the related result object of the operation.
         /// </summary>
-        public TResult ResultObject { get; set; }
+        public TResult? ResultObject { get; set; }
 
         /// <summary>
         /// This method will append an error with a specific `user-friendly` message to this operation result instance.
