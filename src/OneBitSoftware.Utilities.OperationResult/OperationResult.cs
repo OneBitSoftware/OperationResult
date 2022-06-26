@@ -329,5 +329,20 @@
 
             return this;
         }
+
+        /// <summary>
+        /// Sets related object to the provided operation result and returns itself.
+        /// </summary>
+        /// <param name="operationResult">The <see cref="OperationResult{TResult}"/> instance to extend.</param>
+        /// <param name="relatedObject">The value to set to the <see cref="OperationResult{TResult}.ResultObject"/> property.</param>
+        /// <returns>Returns the original <paramref name="operationResult"/> with the appended message.</returns>
+        /// <remarks>
+        /// This method will throw if the provided <paramref name="operationResult"/> is null.
+        /// </remarks>
+        public OperationResult<TResult> WithRelatedObject(TResult relatedObject)
+        {
+            this.ResultObject = relatedObject;
+            return this;
+        }
     }
 }
