@@ -96,5 +96,25 @@
             var errorMessage = $"{className}, {methodName} - The {propertyName} is null.";
             operationResult.AppendError(errorMessage, logLevel: level);
         }
+
+        /// <summary>
+        /// Use this method to check if a value is not null.
+        /// If you want to validate that an entity exists, use the "ValidateExist" extension method.
+        /// If you want to validate that the currently authenticated user is not null, use the "ValidateUser" extension method.
+        /// If <paramref name="value"/> is null, an error message should be appended and a log of the passed <paramref name="level"/> severity would be created.
+        /// </summary>
+        /// <param name="value">The value that should be validated.</param>
+        /// <param name="className">The name of the class where the <paramref name="methodName"/> is defined.</param>
+        /// <param name="methodName">The name of he method where <paramref name="value"/> is used.</param>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <param name="level">The logging severity.</param>
+        public static void ValidateNull(this OperationResult operationResult, object value, string className, string methodName, string propertyName, LogLevel level = LogLevel.Error)
+        {
+            // If the passed value is null, log and append an error message.
+            if (value != null) return;
+
+            var errorMessage = $"{className}, {methodName} - The {propertyName} is null.";
+            operationResult.AppendError(errorMessage, logLevel: level);
+        }
     }
 }

@@ -12,7 +12,6 @@
     /// </summary>
     public class OperationResult
     {
-        private readonly List<IOperationError> _errors = new List<IOperationError>();
         private readonly List<string> _successMessages = new List<string>();
 
         protected readonly ILogger? _logger;
@@ -41,7 +40,7 @@
         /// <summary>
         /// Gets an <see cref="List{T}"/> containing the error codes and messages of the <see cref="OperationResult{T}" />.
         /// </summary>
-        public IReadOnlyCollection<IOperationError> Errors => this._errors.AsReadOnly();
+        public List<IOperationError> Errors { get; internal set; } = new List<IOperationError>();
 
         /// <summary>
         /// Gets or sets the first exception that resulted from the operation.
@@ -214,7 +213,7 @@
         /// Appends an <see cref="IOperationError"/> to the internal errors collection.
         /// </summary>
         /// <param name="error">An instance of <see cref="IOperationError"/> to add to the internal errors collection.</param>
-        protected void AppendErrorInternal(IOperationError error) => this._errors.Add(error);
+        protected void AppendErrorInternal(IOperationError error) => this.Errors.Add(error);
     }
 
     /// <summary>
@@ -236,7 +235,7 @@
         /// </summary>
         /// <param name="logger">An instance of <see cref="ILoggerService"/>.</param>
         /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
-        public OperationResult(ILogger logger) : base(logger)
+        public OperationResult(ILogger? logger) : base(logger)
         {
         }
 
@@ -246,7 +245,7 @@
         /// <param name="resultObject">An initial failure message for the operation result. This will fail the success status.</param>
         /// <param name="logger">An instance of <see cref="ILogger"/>.</param>
         /// <remarks>If the operation is a get operation, an empty result must return a truthy Success value.</remarks>
-        public OperationResult(TResult resultObject, ILogger logger) : base(logger)
+        public OperationResult(TResult resultObject, ILogger? logger) : base(logger)
         {
             this.ResultObject = resultObject;
         }
@@ -264,7 +263,7 @@
         /// <summary>
         /// Gets or sets the related result object of the operation.
         /// </summary>
-        public TResult? ResultObject { get; set; }
+        public TResult ResultObject { get; set; }
 
         /// <summary>
         /// This method will append an error with a specific `user-friendly` message to this operation result instance.
