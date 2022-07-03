@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+using System.Text.Json.Serialization;
     using Microsoft.Extensions.Logging;
     using OneBitSoftware.Utilities.Errors;
 
@@ -24,16 +25,18 @@
         /// <summary>
         /// Gets a value indicating whether the operation has failed.
         /// </summary>
+        [JsonIgnore]
         public bool Fail => this.Errors.Any();
 
         /// <summary>
         /// A collection of optional success messages that can be used to process positive operation result messages.
         /// </summary>
-        public IEnumerable<string> SuccessMessages
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IEnumerable<string>? SuccessMessages
         {
             get
             {
-                return _successMessages;
+                return _successMessages.Any() ? _successMessages : null;
             }
         }
 
@@ -45,6 +48,7 @@
         /// <summary>
         /// Gets or sets the first exception that resulted from the operation.
         /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Exception? InitialException { get; private set; }
 
         /// <summary>

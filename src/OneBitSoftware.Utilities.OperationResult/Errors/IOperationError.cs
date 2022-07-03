@@ -4,7 +4,7 @@
     {
         int? Code { get; set; }
 
-        string Message { get; set; }
+        string? Message { get; set; }
 
         string? Details { get; set; }
     }

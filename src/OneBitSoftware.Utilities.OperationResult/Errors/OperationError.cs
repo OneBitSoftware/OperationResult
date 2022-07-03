@@ -4,7 +4,7 @@
 
     public class OperationError : IOperationError
     {
-        public OperationError(string message, int? code = null, string? details = null)
+        public OperationError(string? message = null, int? code = null, string? details = null)
         {
             this.Message = message;
             this.Code = code;
@@ -13,7 +13,7 @@
 
         public int? Code { get; set; }
 
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public string? Details { get; set; }
 
