@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OneBitSoftware.Utilities.Errors;
 
 namespace OneBitSoftware.Utilities
 {
-    public class PolymorphicOperationErrorConverter<T> : JsonConverter<T>
-        where T : IOperationError
+    public class PolymorphicOperationErrorListConverter<T> : JsonConverter<T>
+        where T : IList<IOperationError>
     {
         private readonly Dictionary<string, Type> _valueMappings = new Dictionary<string, Type>();
         private readonly Dictionary<Type, string> _typeMappings = new Dictionary<Type, string>();
         protected virtual string TypePropertyName => "type";
 
-        public PolymorphicOperationErrorConverter()
+        public PolymorphicOperationErrorListConverter()
         {
             // Define the base OperationError custom type mapping discriminator
-            this.AddMapping("operation_error", typeof(OperationError));
+            this.AddMapping("operation_error", typeof(List<IOperationError>));
         }
 
         public override bool CanConvert(Type typeToConvert)
         {
             if (typeToConvert is null) return false;
-            return typeof(IOperationError).IsAssignableFrom(typeToConvert);
+            return typeof(T).IsAssignableFrom(typeToConvert);
         }
 
         public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -51,20 +53,23 @@ namespace OneBitSoftware.Utilities
 
             if (this._typeMappings.TryGetValue(value.GetType(), out var typeValue) == false) throw new InvalidOperationException($"Model of type {value.GetType()} cannot be successfully serialized.");
 
-            var tempBufferWriter = new ArrayBufferWriter<byte>();
-            var tempWriter = new Utf8JsonWriter(tempBufferWriter);
+            writer.WriteStartArray();
 
-            var fallbackDeserializationOptions = this.ConstructSafeFallbackOptions(options);
-            JsonSerializer.Serialize(tempWriter, value, value.GetType(), fallbackDeserializationOptions);
+            foreach (var error in value)
+            {
+                writer.WriteStartObject();
+                writer.WriteString(this.TypePropertyName, typeValue);
+                writer.WriteString(propertyName: nameof(IOperationError.Code), value: error.Code.ToString());
+                writer.WriteString(
+                    propertyName: nameof(IOperationError.Message),
+                    value: String.IsNullOrEmpty(error.Message) ? string.Empty : error.Message.ToString());
+                writer.WriteString(
+                    propertyName: nameof(IOperationError.Details),
+                    value: String.IsNullOrEmpty(error.Details) ? string.Empty : error.Details.ToString());
+                writer.WriteEndObject();
+            }
 
-            tempWriter.Flush();
-            var jsonDocument = JsonDocument.Parse(tempBufferWriter.WrittenMemory);
-
-            writer.WriteStartObject();
-            writer.WriteString(this.TypePropertyName, typeValue);
-
-            foreach (var property in jsonDocument.RootElement.EnumerateObject()) property.WriteTo(writer);
-            writer.WriteEndObject();
+            writer.WriteEndArray();
         }
 
 
@@ -98,9 +103,9 @@ namespace OneBitSoftware.Utilities
 
         private class ReadOnlyPartialConverter : JsonConverter<T>
         {
-            private readonly PolymorphicOperationErrorConverter<T> _polymorphicConverter;
+            private readonly PolymorphicOperationErrorListConverter<T> _polymorphicConverter;
 
-            internal ReadOnlyPartialConverter(PolymorphicOperationErrorConverter<T> polymorphicConverter)
+            internal ReadOnlyPartialConverter(PolymorphicOperationErrorListConverter<T> polymorphicConverter)
             {
                 this._polymorphicConverter = polymorphicConverter ?? throw new ArgumentNullException(nameof(polymorphicConverter));
             }
