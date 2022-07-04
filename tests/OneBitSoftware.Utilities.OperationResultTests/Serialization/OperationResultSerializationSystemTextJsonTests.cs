@@ -10,7 +10,7 @@ using Xunit;
 
 namespace OneBitSoftware.Utilities.OperationResultTests.Serialization
 {
-    public class OperationResultSerializationTests
+    public class OperationResultSerializationSystemTextJsonTests
     {
         private JsonSerializerOptions GetSerializationOptions()
         {
