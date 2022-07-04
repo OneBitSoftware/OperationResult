@@ -7,14 +7,15 @@ using OneBitSoftware.Utilities.Errors;
 
 namespace OneBitSoftware.Utilities
 {
-    public class PolymorphicOperationErrorConverter<T> : JsonConverter<T>
+    // TODO: comments - used to serialize a custom OperationError
+    public class PolymorphicOperationErrorSerializer<T> : JsonConverter<T>
         where T : IOperationError
     {
         private readonly Dictionary<string, Type> _valueMappings = new Dictionary<string, Type>();
         private readonly Dictionary<Type, string> _typeMappings = new Dictionary<Type, string>();
         protected virtual string TypePropertyName => "type";
 
-        public PolymorphicOperationErrorConverter()
+        public PolymorphicOperationErrorSerializer()
         {
             // Define the base OperationError custom type mapping discriminator
             this.AddMapping("operation_error", typeof(OperationError));
@@ -30,6 +31,7 @@ namespace OneBitSoftware.Utilities
         {
             try
             {
+                // Should not be used, write-only.
                 // Deserialize the JSON to the specified type.
                 var serializationOptions = this.ConstructSafeFallbackOptions(options);
                 serializationOptions.Converters.Add(new ReadOnlyPartialConverter(this));
@@ -98,9 +100,9 @@ namespace OneBitSoftware.Utilities
 
         private class ReadOnlyPartialConverter : JsonConverter<T>
         {
-            private readonly PolymorphicOperationErrorConverter<T> _polymorphicConverter;
+            private readonly PolymorphicOperationErrorSerializer<T> _polymorphicConverter;
 
-            internal ReadOnlyPartialConverter(PolymorphicOperationErrorConverter<T> polymorphicConverter)
+            internal ReadOnlyPartialConverter(PolymorphicOperationErrorSerializer<T> polymorphicConverter)
             {
                 this._polymorphicConverter = polymorphicConverter ?? throw new ArgumentNullException(nameof(polymorphicConverter));
             }

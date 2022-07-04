@@ -1,6 +1,7 @@
 ﻿namespace OneBitSoftware.Utilities.OperationResultTests;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Debug;
 using Xunit;
 
 public class OperationResultConstructorTests
@@ -19,6 +20,18 @@ public class OperationResultConstructorTests
     public void NewOperationResultWithNullLogger_ShouldSucceed()
     {
         var sut = new OperationResult(null);
+
+        Assert.NotNull(sut);
+        Assert.True(sut.Success);
+        Assert.False(sut.Fail);
+    }
+
+    [Fact]
+    public void NewOperationResultWithLogger_ShouldSucceed()
+    {
+
+        var logger = new DebugLoggerProvider();
+        var sut = new OperationResult(logger.CreateLogger("Tests"));
 
         Assert.NotNull(sut);
         Assert.True(sut.Success);
