@@ -17,7 +17,6 @@ namespace OneBitSoftware.Utilities.OperationResultTests.Serialization
             var serializeOptions = new JsonSerializerOptions();
             serializeOptions.Converters.Add(new CustomErrorPolymorphicDeserializer());
             serializeOptions.Converters.Add(new CustomErrorPolymorphicSerializer());
-            // serializeOptions.Converters.Add(new PolymorphicOperationErrorListConverter<IList<IOperationError>>());
             return serializeOptions;
         }
 
@@ -146,6 +145,7 @@ namespace OneBitSoftware.Utilities.OperationResultTests.Serialization
         [Fact]
         public async Task CanSerializeAndDeserializeCustomErrorWithSystemTextJson()
         {
+            // TODO: clean up variables and repeated code
             // Arrange
             var testText = "Test details";
             var customErrorText = "Custom error test details";
