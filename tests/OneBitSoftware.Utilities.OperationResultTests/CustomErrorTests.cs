@@ -11,11 +11,25 @@ namespace OneBitSoftware.Utilities.OperationResultTests
     public class CustomErrorTests
     {
         [Fact]
-        public void TestCustomError()
+        public void CustomError_CanInstantiate()
         {
-            var c = new CustomError();
-            var c1 = typeof(CustomError).IsAssignableFrom(typeof(IOperationError));
-            var c2 = typeof(IOperationError).IsAssignableFrom(typeof(CustomError));
+            var customError = new CustomError();
+
+            Assert.NotNull(customError);
+        }
+
+        [Fact]
+        public void CustomError_IsIOperationError()
+        {
+            Assert.True(typeof(IOperationError).IsAssignableFrom(typeof(CustomError)));
+        }
+
+        [Fact]
+        public void CustomError_IsOperationError()
+        {
+            var customError = new CustomError();
+
+            Assert.True(typeof(OperationError).IsInstanceOfType(customError));
         }
     }
 }

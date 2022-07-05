@@ -11,7 +11,6 @@ namespace OneBitSoftware.Utilities
     public class OperationResultJsonConverter : JsonConverter<OperationResult>
     {
         private readonly Dictionary<string, Type> _valueMappings = new Dictionary<string, Type>();
-        private readonly Dictionary<Type, string> _typeMappings = new Dictionary<Type, string>();
 
         public OperationResultJsonConverter()
         {
@@ -41,10 +40,9 @@ namespace OneBitSoftware.Utilities
         protected bool AddMapping(string typeValue, Type type)
         {
             if (string.IsNullOrWhiteSpace(typeValue) || type is null) return false;
-            if (this._valueMappings.ContainsKey(typeValue) || this._typeMappings.ContainsKey(type)) return false;
+            if (this._valueMappings.ContainsKey(typeValue)) return false;
 
             this._valueMappings[typeValue] = type;
-            this._typeMappings[type] = typeValue;
             return true;
         }
 
@@ -151,7 +149,6 @@ namespace OneBitSoftware.Utilities
                 }
             }
 
-            // TODO
             private JsonSerializerOptions ConstructSafeFallbackOptions(JsonSerializerOptions options)
             {
                 var fallbackSerializationOptions = new JsonSerializerOptions(options);
