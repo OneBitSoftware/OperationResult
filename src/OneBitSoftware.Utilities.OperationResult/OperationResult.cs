@@ -44,7 +44,7 @@
         /// Gets an <see cref="List{T}"/> containing the error codes and messages of the <see cref="OperationResult{T}" />.
         /// </summary>
         public List<IOperationError> Errors { get; internal set; } = new List<IOperationError>();
-
+        
         /// <summary>
         /// Gets or sets the first exception that resulted from the operation.
         /// </summary>
@@ -267,7 +267,7 @@
         /// <summary>
         /// Gets or sets the related result object of the operation.
         /// </summary>
-        public TResult ResultObject { get; set; }
+        public TResult? ResultObject { get; set; }
 
         /// <summary>
         /// This method will append an error with a specific `user-friendly` message to this operation result instance.
@@ -332,6 +332,33 @@
             base.AppendException(exception, errorCode, logLevel);
 
             return this;
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="OperationResult{TResult}"/> and appends the passed error message details to it's internal error collection.
+        /// </summary>
+        /// <param name="message">A message to append to the internal errors collection.</param>
+        /// <param name="code">An optional code to include in the error.</param>
+        /// <param name="logLevel">A log event level. Defaults to Error.</param>
+        /// <param name="details">An optional detail message to add to the error.</param>
+        /// <param name="logger">An optional instance of <see cref="ILogger"/>.</param>
+        /// <returns>An <see cref="OperationResult{TResult}"/> containing the passed exception.</returns>
+        public static new OperationResult<TResult> FromError(string message, int? code = null, LogLevel logLevel = LogLevel.Error, string? details = null, ILogger? logger = null)
+        {
+            var result = new OperationResult<TResult>(logger);
+            return result.AppendError(message, code, logLevel, details);
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="OperationResult"/> and appends the passed exception to it's error collection.
+        /// </summary>
+        /// <param name="exception">The <see cref="Exception"/> to append.</param>
+        /// <param name="logger">An optional instance of <see cref="ILogger"/>.</param>
+        /// <returns>An <see cref="OperationResult{TResult}"/> containing the passed exception.</returns>
+        public static new OperationResult<TResult> FromException(Exception exception, ILogger? logger = null)
+        {
+            var result = new OperationResult<TResult>(logger);
+            return result.AppendException(exception);
         }
 
         /// <summary>
