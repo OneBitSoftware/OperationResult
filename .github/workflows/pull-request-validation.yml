@@ -1,8 +1,8 @@
-name: Main branch and package publish
+name: Pull request validation
 
 on:
-  push:
-    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
@@ -30,9 +30,3 @@ jobs:
 
     - name: Test
       run: dotnet test ./src/OneBitSoftware.Utilities.OperationResult.sln --no-build --verbosity normal
-
-    - name: Pack OneBitSoftware.Utilities.OperationResult
-      run: dotnet pack --no-build --configuration "${{ env.CONFIGURATION }}" ./src/OneBitSoftware.Utilities.OperationResult/OneBitSoftware.Utilities.OperationResult.csproj -o "${{ env.PACKAGES_DIRECTORY }}"
-
-    - name: Publish all packages
-      run: dotnet nuget push "${{ env.PACKAGES_DIRECTORY }}/*.nupkg" --source "${{ env.NUGET_SOURCE }}" --api-key "${{ env.NUGET_KEY }}" --skip-duplicate
