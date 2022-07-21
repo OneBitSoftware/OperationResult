@@ -1,7 +1,7 @@
 name: Main branch and package publish
 
 on:
-  pull_request:
+  push:
     branches: [ main ]
 
 jobs:
