@@ -305,15 +305,26 @@
         }
 
         /// <summary>
-        /// Appends error messages from <paramref name="otherOperationResult"/> to <paramref name="originalOperationResult"/>.
+        /// Appends error messages from <paramref name="otherOperationResult"/> to the current instance.
         /// </summary>
-        /// <param name="originalOperationResult">The <see cref="OperationResult"/> to append to.</param>
         /// <param name="otherOperationResult">The <see cref="OperationResult"/> to append from.</param>
-        /// <typeparam name="TOriginal">A type that inherits from <see cref="OperationResult"/>.</typeparam>
         /// <typeparam name="TOther">A type that inherits from <see cref="OperationResult"/>.</typeparam>
         /// <returns>The original <see cref="OperationResult"/> with the appended messages from <paramref name="otherOperationResult"/>.</returns>
+        [Obsolete("Please use AppendErrors instead. This method will be removed to avoid confusion.")]
         public OperationResult<TResult> AppendErrorMessages<TOther>(TOther otherOperationResult)
             where TOther : OperationResult
+        {
+            base.AppendErrors(otherOperationResult);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Appends error from <paramref name="otherOperationResult"/> to the current instance.
+        /// </summary>
+        /// <param name="otherOperationResult">The <see cref="OperationResult"/> to append from.</param>
+        /// <returns>The original <see cref="OperationResult"/> with the appended messages from <paramref name="otherOperationResult"/>.</returns>
+        public new OperationResult<TResult> AppendErrors(OperationResult otherOperationResult)
         {
             base.AppendErrors(otherOperationResult);
 
