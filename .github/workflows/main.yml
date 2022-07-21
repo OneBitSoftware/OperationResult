@@ -1,8 +1,6 @@
-name: .NET
+name: Main branch and package publish
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
