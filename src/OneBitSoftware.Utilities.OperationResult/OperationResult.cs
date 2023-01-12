@@ -164,7 +164,7 @@
         /// <param name="errorCode">The error code.</param>
         /// <param name="logLevel">The <see cref="LogEventLevel"/> logging severity.</param>
         /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-        public OperationResult AppendException(Exception exception, int errorCode = 0, LogLevel? logLevel = null)
+        public OperationResult AppendException(Exception exception, int? errorCode = null, LogLevel? logLevel = null)
         {
             if (exception is null) throw new ArgumentNullException(nameof(exception));
 
@@ -338,7 +338,7 @@
         /// <param name="errorCode">The error code.</param>
         /// <param name="logLevel">The <see cref="LogEventLevel"/> logging severity.</param>
         /// <returns>The current instance of the <see cref="OperationResult{TResult}"/>.</returns>
-        public new OperationResult<TResult> AppendException(Exception exception, int errorCode = 0, LogLevel? logLevel = null)
+        public new OperationResult<TResult> AppendException(Exception exception, int? errorCode = null, LogLevel? logLevel = null)
         {
             base.AppendException(exception, errorCode, logLevel);
 
