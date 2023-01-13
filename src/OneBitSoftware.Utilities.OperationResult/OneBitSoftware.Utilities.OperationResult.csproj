@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.3" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>OneBitSoftware; OperationResult;</PackageTags>
-    <Version>1.4.5</Version>
+    <Version>1.4.6</Version>
   </PropertyGroup>
 
 </Project>
