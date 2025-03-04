@@ -93,8 +93,18 @@
         {
             if (otherOperationResult is null) return this;
 
-            // Append the error message without logging (presuming that there is already a log message).
-            foreach (var error in otherOperationResult.Errors) this.AppendErrorInternal(error);
+            foreach (var error in otherOperationResult.Errors)
+            {
+                this.AppendErrorInternal(error);
+
+                // Logs messages if the other operation result does not have a logger
+                // BUG: We don't know the severity of the message and need to assume a level.
+                // The task is to make IOperationError have info about the severity, so it can be used here
+                if (this._logger is not null && otherOperationResult._logger is null)
+                {
+                    this._logger.Log(LogLevel.Error, error.Message);
+                }
+            }
 
             return this;
         }
