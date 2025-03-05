@@ -1,6 +1,7 @@
 ﻿namespace OneBitSoftware.Utilities.Errors
 {
     using System.Text;
+    using Microsoft.Extensions.Logging;
 
     public class OperationError : IOperationError
     {

@@ -62,7 +62,7 @@ public class OperationResultAppendErrorsTests
         operationResultBase.AppendError(message2, errorCode2, LogLevel.Debug, detail2);
 
         // Act - AppendErrorMessages is to be removed
-        operationResultBase.AppendErrorMessages(operationResultTarget);
+        operationResultBase.AppendErrors(operationResultTarget);
 
         // Assert
         Assert.False(operationResultBase.Success);
@@ -110,5 +110,71 @@ public class OperationResultAppendErrorsTests
         Assert.NotNull(operationResultBase.Errors.Single(r => r.Code.Equals(errorCode2)));
         Assert.NotNull(operationResultBase.Errors.Single(r => r.Message.Equals(message2)));
         Assert.NotNull(operationResultBase.Errors.Single(r => r.Details is not null && r.Details.Equals(detail2)));
+    }
+
+    [Fact]
+    public void AppendErrors_ShouldLogWhenCreatedWithALogger()
+    {
+        // Arrange
+        var testLogger = new TestLogger();
+        var operationResultNoLogger = new OperationResult();
+        var operationResultWithLogger = new OperationResult(testLogger);
+
+        // Act
+        operationResultNoLogger.AppendError("test");
+        operationResultWithLogger.AppendErrors(operationResultNoLogger);
+
+        // Assert
+        Assert.Equal(1, testLogger.LogMessages.Count);
+    }
+
+    [Fact]
+    public void AppendErrors_ShouldLogOnceWhenCreatedWithALogger()
+    {
+        // Arrange
+        var testLogger = new TestLogger();
+        var operationResultWithLogger = new OperationResult(testLogger);
+        var operationResultWithLogger2 = new OperationResult(testLogger);
+
+        // Act
+        operationResultWithLogger2.AppendError("test");
+        operationResultWithLogger.AppendErrors(operationResultWithLogger2);
+
+        // Assert
+        Assert.Equal(1, testLogger.LogMessages.Count);
+    }
+
+    [Fact]
+    public void AppendErrors_ShouldLogOnceWhenNestingWithALogger()
+    {
+        // Arrange
+        var testLogger = new TestLogger();
+        var operationResultWithLogger = new OperationResult(testLogger);
+        var operationResultWithLogger2 = new OperationResult(testLogger);
+        var operationResultWithLogger3 = new OperationResult(testLogger);
+
+        // Act
+        operationResultWithLogger3.AppendError("test1");
+        operationResultWithLogger2.AppendError("test2");
+        operationResultWithLogger.AppendErrors(operationResultWithLogger2);
+
+        // Assert
+        Assert.Equal(2, testLogger.LogMessages.Count);
+    }
+
+    [Fact]
+    public void AppendErrors_ShouldLogWhenCreatedWithNoLogger()
+    {
+        // Arrange
+        var testLogger = new TestLogger();
+        var operationResultNoLogger = new OperationResult();
+        var operationResultWithLogger = new OperationResult(testLogger);
+
+        // Act
+        operationResultWithLogger.AppendError("test");
+        operationResultNoLogger.AppendErrors(operationResultNoLogger);
+
+        // Assert
+        Assert.Equal(1, testLogger.LogMessages.Count);
     }
 }
