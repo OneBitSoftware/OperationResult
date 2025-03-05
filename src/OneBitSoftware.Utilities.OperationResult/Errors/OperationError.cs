@@ -1,6 +1,7 @@
 ﻿namespace OneBitSoftware.Utilities.Errors
 {
     using System.Text;
+    using Microsoft.Extensions.Logging;
 
     public class OperationError : IOperationError
     {
@@ -17,11 +18,19 @@
 
         public string? Details { get; set; }
 
+        /// <inheritdoc />
+        public LogLevel? LogLevel { get; set; }
+
+        /// <inheritdoc />
+        bool IOperationError.Logged { get; set; }
+
         public override string ToString()
         {
             var result = new StringBuilder();
 
             if (this.Code != null) result.AppendLine($"Code: {this.Code}");
+
+            if (this.LogLevel is not null) result.AppendLine($"Severity: {this.LogLevel}"); // TODO: maybe convert to string?
 
             if (!string.IsNullOrWhiteSpace(this.Message)) result.AppendLine($"Message: {this.Message}");
 

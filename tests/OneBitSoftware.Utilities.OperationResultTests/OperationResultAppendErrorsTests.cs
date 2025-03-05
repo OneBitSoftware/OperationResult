@@ -144,7 +144,23 @@ public class OperationResultAppendErrorsTests
         Assert.Equal(1, testLogger.LogMessages.Count);
     }
 
+    [Fact]
+    public void AppendErrors_ShouldLogOnceWhenNestingWithALogger()
+    {
+        // Arrange
+        var testLogger = new TestLogger();
+        var operationResultWithLogger = new OperationResult(testLogger);
+        var operationResultWithLogger2 = new OperationResult(testLogger);
+        var operationResultWithLogger3 = new OperationResult(testLogger);
 
+        // Act
+        operationResultWithLogger3.AppendError("test1");
+        operationResultWithLogger2.AppendError("test2");
+        operationResultWithLogger.AppendErrors(operationResultWithLogger2);
+
+        // Assert
+        Assert.Equal(2, testLogger.LogMessages.Count);
+    }
 
     [Fact]
     public void AppendErrors_ShouldLogWhenCreatedWithNoLogger()

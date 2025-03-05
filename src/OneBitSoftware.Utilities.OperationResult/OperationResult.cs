@@ -98,11 +98,10 @@
                 this.AppendErrorInternal(error);
 
                 // Logs messages if the other operation result does not have a logger
-                // BUG: We don't know the severity of the message and need to assume a level.
-                // The task is to make IOperationError have info about the severity, so it can be used here
-                if (this._logger is not null && otherOperationResult._logger is null)
+                if (this._logger is not null && otherOperationResult._logger is null && !error.Logged)
                 {
-                    this._logger.Log(LogLevel.Error, error.Message);
+                    this._logger.Log(GetLogLevel(error.LogLevel), error.Message);
+                    error.Logged = true;
                 }
             }
 
@@ -159,9 +158,8 @@
 
             if (this._logger != null)
             {
-#pragma warning disable CA2254 // Template should be a static expression
                 this._logger.Log(GetLogLevel(logLevel), error.Message);
-#pragma warning restore CA2254 // Template should be a static expression
+                error.Logged = true;
             }
 
             return this;
@@ -220,7 +218,6 @@
             return result.AppendError(message, code, logLevel, details);
         }
 
-        // TODO: this method needs completing.
         protected static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
 
         /// <summary>
@@ -290,26 +287,6 @@
         public new OperationResult<TResult> AppendError(string message, int? code = null, LogLevel? logLevel = null, string? details = null)
         {
             base.AppendError(message, code, logLevel, details);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Appends an <see cref="IOperationError"/> to the internal errors collection.
-        /// </summary>
-        /// <param name="error">An instance of <see cref="IOperationError"/> to add to the internal errors collection.</param>
-        /// <param name="logLevel">The logging level.</param>
-        /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-        public new OperationResult<TResult> AppendError(IOperationError error, LogLevel? logLevel = LogLevel.Error)
-        {
-            base.AppendErrorInternal(error);
-
-            if (this._logger != null)
-            {
-#pragma warning disable CA2254 // Template should be a static expression
-                this._logger.Log(GetLogLevel(logLevel), error.Message);
-#pragma warning restore CA2254 // Template should be a static expression
-            }
 
             return this;
         }

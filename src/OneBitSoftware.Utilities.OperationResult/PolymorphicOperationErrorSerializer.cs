@@ -54,7 +54,7 @@ namespace OneBitSoftware.Utilities
             if (this._typeMappings.TryGetValue(value.GetType(), out var typeValue) == false) throw new InvalidOperationException($"Model of type {value.GetType()} cannot be successfully serialized.");
 
             var tempBufferWriter = new ArrayBufferWriter<byte>();
-            var tempWriter = new Utf8JsonWriter(tempBufferWriter);
+            var tempWriter = new Utf8JsonWriter(tempBufferWriter); // TODO: dispose with using var
 
             var fallbackDeserializationOptions = this.ConstructSafeFallbackOptions(options);
             JsonSerializer.Serialize(tempWriter, value, value.GetType(), fallbackDeserializationOptions);
