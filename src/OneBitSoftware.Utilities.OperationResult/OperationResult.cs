@@ -13,9 +13,14 @@
     /// </summary>
     public class OperationResult
     {
-        private readonly List<string> _successMessages = new List<string>();
+        /// <summary>
+        /// Contains <see cref="IOperationError"/> instances that have not been logged.
+        /// </summary>
+        private readonly List<(IOperationError Error, LogLevel? LogLevel)> _errorsNotLogged = new();
 
-        protected readonly ILogger? _logger;
+        private readonly List<string> _successMessages = new();
+
+        private readonly ILogger? _logger;
 
         /// <summary>
         /// Gets or sets a value indicating whether the operation is successful or not.
@@ -44,7 +49,7 @@
         /// Gets an <see cref="List{T}"/> containing the error codes and messages of the <see cref="OperationResult{T}" />.
         /// </summary>
         public List<IOperationError> Errors { get; internal set; } = new List<IOperationError>();
-        
+
         /// <summary>
         /// Gets or sets the first exception that resulted from the operation.
         /// </summary>
@@ -93,17 +98,21 @@
         {
             if (otherOperationResult is null) return this;
 
-            foreach (var error in otherOperationResult.Errors)
+            // store any messages for logging at a later stage, when merged to an OperationResult with a logger.
+            if (this._logger is null) 
             {
-                this.AppendErrorInternal(error);
-
-                // Logs messages if the other operation result does not have a logger
-                if (this._logger is not null && otherOperationResult._logger is null && !error.Logged)
-                {
-                    this._logger.Log(GetLogLevel(error.LogLevel), error.Message);
-                    error.Logged = true;
-                }
+                this._errorsNotLogged.AddRange(otherOperationResult._errorsNotLogged); 
             }
+            else
+            {
+                foreach (var (error, logLevel) in otherOperationResult._errorsNotLogged)
+                    this.LogInternal(error, logLevel);
+
+                otherOperationResult._errorsNotLogged.Clear();
+            }
+
+            // Append the error message without logging (presuming that there is already a log message).
+            foreach (var error in otherOperationResult.Errors) this.AppendErrorInternal(error);
 
             return this;
         }
@@ -120,7 +129,7 @@
         {
             if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
-            var error = new OperationError(message, code) { Details = details, LogLevel = logLevel };
+            var error = new OperationError(message, code) { Details = details };
             this.AppendError(error, logLevel);
 
             return this;
@@ -140,7 +149,7 @@
         {
             if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
-            var error = new T() { Message = message, Code = code, Details = details, LogLevel = logLevel };
+            var error = new T() { Message = message, Code = code, Details = details };
             this.AppendError(error, logLevel);
 
             return this;
@@ -155,31 +164,26 @@
         public OperationResult AppendError(IOperationError error, LogLevel? logLevel = LogLevel.Error)
         {
             this.AppendErrorInternal(error);
-
-            if (this._logger != null)
-            {
-                this._logger.Log(GetLogLevel(logLevel), error.Message);
-                error.Logged = true;
-            }
+            this.LogInternal(error, logLevel);
 
             return this;
         }
 
         /// <summary>
-        /// Appends an exception to the error message collection and logs the full exception as an Error <see cref="LogEventLevel"/> level. A call to this method will set the Success property to false.
+        /// Appends an exception to the error message collection and logs the full exception as an Error <see cref="LogLevel"/> level. A call to this method will set the Success property to false.
         /// </summary>
         /// <param name="exception">The exception to log.</param>
         /// <param name="errorCode">The error code.</param>
-        /// <param name="logLevel">The <see cref="LogEventLevel"/> logging severity.</param>
+        /// <param name="logLevel">The <see cref="LogLevel"/> logging severity.</param>
         /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-        public OperationResult AppendException(Exception exception, int? errorCode = null, LogLevel? logLevel = null)
+        public OperationResult AppendException(Exception exception, int errorCode = 0, LogLevel? logLevel = null)
         {
             if (exception is null) throw new ArgumentNullException(nameof(exception));
 
             // Append the exception as a first if it is not yet set.
             this.InitialException ??= exception;
 
-            var error = new OperationError(exception.ToString(), errorCode, null, LogLevel.Error);
+            var error = new OperationError(exception.ToString(), errorCode);
             this.AppendError(error, logLevel);
 
             return this;
@@ -218,13 +222,28 @@
             return result.AppendError(message, code, logLevel, details);
         }
 
-        protected static LogLevel GetLogLevel(LogLevel? optionalLevel) => optionalLevel ?? LogLevel.Error;
-
         /// <summary>
         /// Appends an <see cref="IOperationError"/> to the internal errors collection.
         /// </summary>
         /// <param name="error">An instance of <see cref="IOperationError"/> to add to the internal errors collection.</param>
         protected void AppendErrorInternal(IOperationError error) => this.Errors.Add(error);
+
+        /// <summary>
+        /// Logs to the internal logger if it is set, otherwise it will add the error to the internal errors collection.
+        /// </summary>
+        /// <param name="error">The <see cref="IOperationError"/> to log.</param>
+        /// <param name="logLevel">The log level.</param>
+        private void LogInternal(IOperationError error, LogLevel? logLevel)
+        {
+            if (this._logger is null)
+            {
+                this._errorsNotLogged.Add((Error: error, LogLevel: logLevel));
+            }
+            else
+            {
+                this._logger.Log(logLevel ?? LogLevel.Error, error.Message);
+            }
+        }
     }
 
     /// <summary>
@@ -292,40 +311,13 @@
         }
 
         /// <summary>
-        /// Appends error messages from <paramref name="otherOperationResult"/> to the current instance.
-        /// </summary>
-        /// <param name="otherOperationResult">The <see cref="OperationResult"/> to append from.</param>
-        /// <typeparam name="TOther">A type that inherits from <see cref="OperationResult"/>.</typeparam>
-        /// <returns>The original <see cref="OperationResult"/> with the appended messages from <paramref name="otherOperationResult"/>.</returns>
-        [Obsolete("Please use AppendErrors instead. This method will be removed to avoid confusion.")]
-        public OperationResult<TResult> AppendErrorMessages<TOther>(TOther otherOperationResult)
-            where TOther : OperationResult
-        {
-            base.AppendErrors(otherOperationResult);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Appends error from <paramref name="otherOperationResult"/> to the current instance.
-        /// </summary>
-        /// <param name="otherOperationResult">The <see cref="OperationResult"/> to append from.</param>
-        /// <returns>The original <see cref="OperationResult"/> with the appended messages from <paramref name="otherOperationResult"/>.</returns>
-        public new OperationResult<TResult> AppendErrors(OperationResult otherOperationResult)
-        {
-            base.AppendErrors(otherOperationResult);
-
-            return this;
-        }
-
-        /// <summary>
         /// Appends an exception to the error message collection and logs the full exception as an Error <see cref="LogEventLevel"/> level. A call to this method will set the Success property to false.
         /// </summary>
         /// <param name="exception">The exception to log.</param>
         /// <param name="errorCode">The error code.</param>
         /// <param name="logLevel">The <see cref="LogEventLevel"/> logging severity.</param>
         /// <returns>The current instance of the <see cref="OperationResult{TResult}"/>.</returns>
-        public new OperationResult<TResult> AppendException(Exception exception, int? errorCode = null, LogLevel? logLevel = null)
+        public new OperationResult<TResult> AppendException(Exception exception, int errorCode = 0, LogLevel? logLevel = null)
         {
             base.AppendException(exception, errorCode, logLevel);
 

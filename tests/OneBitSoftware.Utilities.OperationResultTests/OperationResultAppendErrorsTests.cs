@@ -62,7 +62,7 @@ public class OperationResultAppendErrorsTests
         operationResultBase.AppendError(message2, errorCode2, LogLevel.Debug, detail2);
 
         // Act - AppendErrorMessages is to be removed
-        operationResultBase.AppendErrorMessages(operationResultTarget);
+        operationResultBase.AppendErrors(operationResultTarget);
 
         // Assert
         Assert.False(operationResultBase.Success);
