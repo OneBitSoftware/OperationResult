@@ -120,7 +120,7 @@
         {
             if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
-            var error = new OperationError(message, code) { Details = details };
+            var error = new OperationError(message, code) { Details = details, LogLevel = logLevel };
             this.AppendError(error, logLevel);
 
             return this;
@@ -140,7 +140,7 @@
         {
             if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
-            var error = new T() { Message = message, Code = code, Details = details };
+            var error = new T() { Message = message, Code = code, Details = details, LogLevel = logLevel };
             this.AppendError(error, logLevel);
 
             return this;
@@ -179,7 +179,7 @@
             // Append the exception as a first if it is not yet set.
             this.InitialException ??= exception;
 
-            var error = new OperationError(exception.ToString(), errorCode);
+            var error = new OperationError(exception.ToString(), errorCode, null, LogLevel.Error);
             this.AppendError(error, logLevel);
 
             return this;

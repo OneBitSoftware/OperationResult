@@ -56,7 +56,7 @@ namespace OneBitSoftware.Utilities.OperationResultTests.Serialization
             // Assert
             Assert.Contains(testText, text);
             Assert.Contains(operationErrorText, text);
-            var expectText = @"{""Success"":false,""Errors"":[{""type"":""operation_error"",""Code"":123,""Message"":""Test"",""Details"":""\u0022type\u0022""}]}";
+            var expectText = @"{""Success"":false,""Errors"":[{""type"":""operation_error"",""Code"":123,""Message"":""Test"",""Details"":""\u0022type\u0022"",""LogLevel"":null}]}";
             Assert.Equal(expectText, text);
         }
 
@@ -67,7 +67,7 @@ namespace OneBitSoftware.Utilities.OperationResultTests.Serialization
             var testText = "\"type\"";
             var outputStream = new MemoryStream();
             var operationResult = new OperationResult();
-            operationResult.AppendError(new OperationError(message: "Test") { Code = 123, Details = testText });
+            operationResult.AppendError(new OperationError(message: "Test") { Code = 123, Details = testText, LogLevel = Microsoft.Extensions.Logging.LogLevel.Warning });
 
             // Act
             await JsonSerializer.SerializeAsync(outputStream, operationResult, GetSerializationOptions());
@@ -75,7 +75,7 @@ namespace OneBitSoftware.Utilities.OperationResultTests.Serialization
             string text = new StreamReader(outputStream).ReadToEnd();
 
             // Assert
-            var expectText = @"{""Success"":false,""Errors"":[{""type"":""operation_error"",""Code"":123,""Message"":""Test"",""Details"":""\u0022type\u0022""}]}";
+            var expectText = @"{""Success"":false,""Errors"":[{""type"":""operation_error"",""Code"":123,""Message"":""Test"",""Details"":""\u0022type\u0022"",""LogLevel"":3}]}";
             Assert.Equal(expectText, text);
         }
 
