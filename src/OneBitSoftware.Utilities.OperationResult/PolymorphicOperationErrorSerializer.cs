@@ -51,15 +51,16 @@ namespace OneBitSoftware.Utilities
                 return;
             }
 
-            if (this._typeMappings.TryGetValue(value.GetType(), out var typeValue) == false) throw new InvalidOperationException($"Model of type {value.GetType()} cannot be successfully serialized.");
+            if (!this._typeMappings.TryGetValue(value.GetType(), out var typeValue))
+                throw new InvalidOperationException($"Model of type {value.GetType()} cannot be successfully serialized.");
 
             var tempBufferWriter = new ArrayBufferWriter<byte>();
-            var tempWriter = new Utf8JsonWriter(tempBufferWriter); // TODO: dispose with using var
-
-            var fallbackDeserializationOptions = this.ConstructSafeFallbackOptions(options);
-            JsonSerializer.Serialize(tempWriter, value, value.GetType(), fallbackDeserializationOptions);
-
-            tempWriter.Flush();
+            using (var tempWriter = new Utf8JsonWriter(tempBufferWriter))
+            {
+                var fallbackDeserializationOptions = this.ConstructSafeFallbackOptions(options);
+                JsonSerializer.Serialize(tempWriter, value, value.GetType(), fallbackDeserializationOptions);
+                tempWriter.Flush();
+            }
             var jsonDocument = JsonDocument.Parse(tempBufferWriter.WrittenMemory);
 
             writer.WriteStartObject();
@@ -98,7 +99,7 @@ namespace OneBitSoftware.Utilities
             return fallbackSerializationOptions;
         }
 
-        private class ReadOnlyPartialConverter : JsonConverter<T>
+        private sealed class ReadOnlyPartialConverter : JsonConverter<T>
         {
             private readonly PolymorphicOperationErrorSerializer<T> _polymorphicConverter;
 

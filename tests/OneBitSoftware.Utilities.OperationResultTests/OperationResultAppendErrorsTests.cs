@@ -28,7 +28,7 @@ public class OperationResultAppendErrorsTests
         operationResultBase.AppendError(message2, errorCode2, LogLevel.Debug, detail2);
 
         // Act
-        operationResultBase.AppendErrors(operationResultTarget);
+        operationResultBase.AppendErrors<OperationResult>(operationResultTarget);
 
         // Assert
         Assert.False(operationResultBase.Success);
@@ -62,7 +62,7 @@ public class OperationResultAppendErrorsTests
         operationResultBase.AppendError(message2, errorCode2, LogLevel.Debug, detail2);
 
         // Act - AppendErrorMessages is to be removed
-        operationResultBase.AppendErrors(operationResultTarget);
+        operationResultBase.AppendErrors<OperationResult<object>>(operationResultTarget);
 
         // Assert
         Assert.False(operationResultBase.Success);
@@ -96,7 +96,7 @@ public class OperationResultAppendErrorsTests
         operationResultBase.AppendError(message2, errorCode2, LogLevel.Debug, detail2);
 
         // Act
-        operationResultBase.AppendErrors(operationResultTarget);
+        operationResultBase.AppendErrors<OperationResult<string>>(operationResultTarget);
 
         // Assert
         Assert.False(operationResultBase.Success);
@@ -122,7 +122,7 @@ public class OperationResultAppendErrorsTests
 
         // Act
         operationResultNoLogger.AppendError("test");
-        operationResultWithLogger.AppendErrors(operationResultNoLogger);
+        operationResultWithLogger.AppendErrors<OperationResult>(operationResultNoLogger);
 
         // Assert
         Assert.Equal(1, testLogger.LogMessages.Count);
@@ -138,7 +138,7 @@ public class OperationResultAppendErrorsTests
 
         // Act
         operationResultWithLogger2.AppendError("test");
-        operationResultWithLogger.AppendErrors(operationResultWithLogger2);
+        operationResultWithLogger.AppendErrors<OperationResult>(operationResultWithLogger2);
 
         // Assert
         Assert.Equal(1, testLogger.LogMessages.Count);
@@ -156,7 +156,7 @@ public class OperationResultAppendErrorsTests
         // Act
         operationResultWithLogger3.AppendError("test1");
         operationResultWithLogger2.AppendError("test2");
-        operationResultWithLogger.AppendErrors(operationResultWithLogger2);
+        operationResultWithLogger.AppendErrors<OperationResult>(operationResultWithLogger2);
 
         // Assert
         Assert.Equal(2, testLogger.LogMessages.Count);
@@ -172,7 +172,7 @@ public class OperationResultAppendErrorsTests
 
         // Act
         operationResultWithLogger.AppendError("test");
-        operationResultNoLogger.AppendErrors(operationResultNoLogger);
+        operationResultNoLogger.AppendErrors<OperationResult>(operationResultNoLogger);
 
         // Assert
         Assert.Equal(1, testLogger.LogMessages.Count);

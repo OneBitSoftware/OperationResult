@@ -22,7 +22,7 @@
         public static void ValidateAny<T, TValue>(this OperationResult<T> operationResult, IEnumerable<TValue> value, string className, string methodName, string identifierPropertyName, LogLevel level = LogLevel.Error)
         {
             // If the passed value is null, log and append an error message.
-            if (value == null)
+            if (value != null)
             {
                 var errorMessage = $"{className}, {methodName} - An entity with that {identifierPropertyName} does not exist.";
                 operationResult.AppendError(errorMessage, logLevel: level);
@@ -78,8 +78,8 @@
         public static void ValidateDefault<T, TValue>(this OperationResult<T> operationResult, TValue value, string className, string methodName, string propertyName, LogLevel level = LogLevel.Error)
             where TValue : struct, IEquatable<TValue>
         {
-            // If the passed value is null, log and append an error message.
-            if (value.Equals(default) == false) return;
+            // If the passed value is default, log and append an error message.
+            if (!value.Equals(default)) return;
 
             var errorMessage = $"{className}, {methodName} - The {propertyName} has a default value.";
             operationResult.AppendError(errorMessage, logLevel: level);
@@ -98,8 +98,8 @@
         public static void ValidateDefault<TValue>(this OperationResult operationResult, TValue value, string className, string methodName, string propertyName, LogLevel level = LogLevel.Error)
             where TValue : struct, IEquatable<TValue>
         {
-            // If the passed value is null, log and append an error message.
-            if (value.Equals(default) == false) return;
+            // If the passed value is default, log and append an error message.
+            if (!value.Equals(default)) return;
 
             var errorMessage = $"{className}, {methodName} - The {propertyName} has a default value.";
             operationResult.AppendError(errorMessage, logLevel: level);
@@ -117,8 +117,8 @@
         /// <param name="level">The logging severity.</param>
         public static void ValidateNullOrWhitespace<T>(this OperationResult<T> operationResult, string value, string className, string methodName, string propertyName, LogLevel level = LogLevel.Error)
         {
-            // If the passed value is null, empty or consists only of whitespace characters, log and append an error message.
-            if (string.IsNullOrWhiteSpace(value) == false) return;
+            // If the passed value is not null, empty or consists only of whitespace characters, return.
+            if (!string.IsNullOrWhiteSpace(value)) return;
 
             var errorMessage = $"{className}, {methodName} - The {propertyName} is null, empty or consists only of whitespace characters.";
             operationResult.AppendError(errorMessage, logLevel: level);
@@ -135,8 +135,8 @@
         /// <param name="level">The logging severity.</param>
         public static void ValidateNullOrWhitespace(this OperationResult operationResult, string value, string className, string methodName, string propertyName, LogLevel level = LogLevel.Error)
         {
-            // If the passed value is null, empty or consists only of whitespace characters, log and append an error message.
-            if (string.IsNullOrWhiteSpace(value) == false) return;
+            // If the passed value is not null, empty or consists only of whitespace characters, return.
+            if (!string.IsNullOrWhiteSpace(value)) return;
 
             var errorMessage = $"{className}, {methodName} - The {propertyName} is null, empty or consists only of whitespace characters.";
             operationResult.AppendError(errorMessage, logLevel: level);

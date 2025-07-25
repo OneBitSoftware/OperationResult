@@ -102,23 +102,21 @@ namespace OneBitSoftware.Utilities
                     var deserializeResult = JsonSerializer.Deserialize(ref readerRestore, typeToConvert, fallbackDeserializationOptions);
                     var operationResult = deserializeResult as OperationResult;
 
-                    if (jsonDocument.RootElement.TryGetProperty("Errors", out var errors))
+                    if (operationResult != null && jsonDocument.RootElement.TryGetProperty("Errors", out var errors))
                     {
                         foreach (var item in errors.EnumerateArray())
                         {
                             if (item.TryGetProperty("type", out var typeProperty))
                             {
                                 var returnType = this._operationResultConverter.GetType(typeProperty);
-
                                 AppendErrorType(item, returnType, operationResult, options);
                             }
                             else
                             {
-                                operationResult.AppendError(this.ToObject<OperationError>(item));
+                                operationResult.AppendError(ToObject<OperationError>(item));
                             }
                         }
                     }
-
 
                     return operationResult;
                 }
@@ -126,10 +124,9 @@ namespace OneBitSoftware.Utilities
                 {
                     throw new InvalidOperationException("Invalid JSON in request.", ex);
                 }
-
             }
 
-            public T ToObject<T>(JsonElement element)
+            public static T ToObject<T>(JsonElement element)
             {
                 var json = element.GetRawText();
                 return JsonSerializer.Deserialize<T>(json);
@@ -137,11 +134,11 @@ namespace OneBitSoftware.Utilities
 
             public virtual void AppendErrorType(JsonElement element, Type mappedType, OperationResult operationResult, JsonSerializerOptions options)
             {
-                if (mappedType.Equals("operation_error"))
+                if (mappedType == typeof(OperationError))
                 {
                     operationResult.AppendError(ToObject<OperationError>(element));
                 }
-                else
+                else if (mappedType != null)
                 {
                     var json = element.GetRawText();
                     var deserializeResult = JsonSerializer.Deserialize(json, mappedType, options);

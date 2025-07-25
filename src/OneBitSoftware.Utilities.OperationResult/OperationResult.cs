@@ -90,31 +90,41 @@
         }
 
         /// <summary>
-        /// Appends all errors from another <see cref="OperationResult"/> to the current <see cref="OperationResult"/>.
+        /// Appends all errors from another <see cref="OperationResult"/> (generic or non-generic) to the current <see cref="OperationResult"/>.
         /// </summary>
+        /// <typeparam name="TResultType">The type of the current OperationResult (self type).</typeparam>
         /// <param name="otherOperationResult">The <see cref="OperationResult"/> to append errors from.</param>
         /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
-        public OperationResult AppendErrors(OperationResult otherOperationResult)
+        public TResultType AppendErrors<TResultType>(OperationResult otherOperationResult)
+            where TResultType : OperationResult
         {
-            if (otherOperationResult is null) return this;
-
-            // store any messages for logging at a later stage, when merged to an OperationResult with a logger.
-            if (this._logger is null) 
+            if (otherOperationResult is null) return (TResultType)this;
+            if (this._logger is null)
             {
-                this._errorsNotLogged.AddRange(otherOperationResult._errorsNotLogged); 
+                this._errorsNotLogged.AddRange(otherOperationResult._errorsNotLogged);
             }
             else
             {
                 foreach (var (error, logLevel) in otherOperationResult._errorsNotLogged)
                     this.LogInternal(error, logLevel);
-
                 otherOperationResult._errorsNotLogged.Clear();
             }
-
-            // Append the error message without logging (presuming that there is already a log message).
             foreach (var error in otherOperationResult.Errors) this.AppendErrorInternal(error);
+            return (TResultType)this;
+        }
 
-            return this;
+        /// <summary>
+        /// Appends all errors from another <see cref="OperationResult{TResult}"/> to the current <see cref="OperationResult"/>.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result object in the generic operation result.</typeparam>
+        /// <typeparam name="TResultType">The type of the current OperationResult (self type).</typeparam>
+        /// <param name="otherOperationResult">The <see cref="OperationResult{TResult}"/> to append errors from.</param>
+        /// <returns>The current instance of the <see cref="OperationResult"/>.</returns>
+        public TResultType AppendErrors<TResult, TResultType>(OperationResult<TResult> otherOperationResult)
+            where TResultType : OperationResult
+        {
+            if (otherOperationResult is null) return (TResultType)this;
+            return AppendErrors<TResultType>((OperationResult)otherOperationResult);
         }
 
         /// <summary>
