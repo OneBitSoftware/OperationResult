@@ -177,4 +177,78 @@ public class OperationResultAppendErrorsTests
         // Assert
         Assert.Equal(1, testLogger.LogMessages.Count);
     }
+
+    [Fact]
+    public void AppendErrors_NonGenericSource_To_GenericTarget_Retains_Generic_Type_And_MergesErrors()
+    {
+        // Arrange
+        var source = new OperationResult();
+        source.AppendError("E1", 101, LogLevel.Warning, "D1");
+
+        var target = new OperationResult<string>();
+        target.AppendError("E0", 100, LogLevel.Information, "D0");
+
+        // Act
+        var returned = target.AppendErrors(source);
+
+        // Assert
+        Assert.Same(target, returned);
+        Assert.True(target.Fail);
+        Assert.Equal(2, target.Errors.Count);
+        Assert.NotNull(target.Errors.Single(e => e is { Code: 100, Message: "E0" }));
+        Assert.NotNull(target.Errors.Single(e => e is { Code: 101, Message: "E1" }));
+    }
+
+    [Fact]
+    public void AppendErrors_GenericSource_To_GenericTarget_Retains_Generic_Type_And_MergesErrors()
+    {
+        // Arrange
+        var source = new OperationResult<double>();
+        source.AppendError("E1", 101, LogLevel.Warning, "D1");
+
+        var target = new OperationResult<string>();
+        target.AppendError("E0", 100, LogLevel.Information, "D0");
+
+        // Act
+        var returned = target.AppendErrors(source);
+
+        // Assert
+        Assert.Same(target, returned);
+        Assert.True(target.Fail);
+        Assert.Equal(2, target.Errors.Count);
+        Assert.NotNull(target.Errors.Single(e => e is { Code: 100, Message: "E0" }));
+        Assert.NotNull(target.Errors.Single(e => e is { Code: 101, Message: "E1" }));
+    }
+
+    [Fact]
+    public void AppendErrors_WithNullSource_On_NonGenericTarget_Returns_Same_Instance_And_NoChange()
+    {
+        // Arrange
+        var target = new OperationResult();
+        target.AppendError("E0", 100, LogLevel.Information, "D0");
+        var beforeCount = target.Errors.Count;
+
+        // Act
+        var returned = target.AppendErrors(null);
+
+        // Assert
+        Assert.Same(target, returned);
+        Assert.Equal(beforeCount, target.Errors.Count);
+    }
+
+    [Fact]
+    public void AppendErrors_WithNullSource_On_GenericTarget_Returns_Same_Instance_And_NoChange()
+    {
+        // Arrange
+        var target = new OperationResult<object>();
+        target.AppendError("E0", 100, LogLevel.Information, "D0");
+        var beforeCount = target.Errors.Count;
+
+        // Act
+        var returned = target.AppendErrors((OperationResult)null);
+
+        // Assert
+        Assert.Same(target, returned);
+        Assert.Equal(beforeCount, target.Errors.Count);
+    }
 }

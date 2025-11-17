@@ -296,6 +296,17 @@
         public TResult? ResultObject { get; set; }
 
         /// <summary>
+        /// Appends error from <paramref name="otherOperationResult"/> to the current instance.
+        /// </summary>
+        /// <param name="otherOperationResult">The <see cref="OperationResult"/> to append from.</param>
+        /// <returns>The original <see cref="OperationResult"/> with the appended messages from <paramref name="otherOperationResult"/>.</returns>
+        public new OperationResult<TResult> AppendErrors(OperationResult? otherOperationResult)
+        {
+            base.AppendErrors(otherOperationResult);
+            return this;
+        }
+
+        /// <summary>
         /// This method will append an error with a specific `user-friendly` message to this operation result instance.
         /// </summary>
         /// <param name="message">A label consuming component defining the 'user-friendly' message.</param>
