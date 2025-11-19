@@ -32,7 +32,7 @@
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>OneBitSoftware; OperationResult;</PackageTags>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
   </PropertyGroup>
 
 </Project>

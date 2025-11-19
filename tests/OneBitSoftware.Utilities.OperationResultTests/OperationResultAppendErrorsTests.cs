@@ -259,7 +259,7 @@ public class OperationResultAppendErrorsTests
         var originalResult = new { Id = 42, Name = "Test" };
         var target = new OperationResult<object>(originalResult);
 
-        var source = new OperationResult();
+        var source = new OperationResult<int>();
         source.AppendError("Source error", 500);
 
         // Act
@@ -276,7 +276,7 @@ public class OperationResultAppendErrorsTests
     public void AppendErrors_MaintainsFluentChaining_WithGenericType()
     {
         // Arrange
-        var source1 = new OperationResult();
+        var source1 = new OperationResult<double>();
         source1.AppendError("E1", 1);
 
         var source2 = new OperationResult<int>();
@@ -301,7 +301,7 @@ public class OperationResultAppendErrorsTests
     {
         // Arrange
         var sourceException = new InvalidOperationException("Source exception");
-        var source = new OperationResult();
+        var source = new OperationResult<int>();
         source.AppendException(sourceException, 999);
 
         var target = new OperationResult<double>();
@@ -340,7 +340,7 @@ public class OperationResultAppendErrorsTests
     public void AppendErrors_MergesSuccessMessages_AreNotTransferred()
     {
         // Arrange
-        var source = new OperationResult();
+        var source = new OperationResult<double>();
         source.AddSuccessMessage("Success from source");
         source.AppendError("But has error", 1);
 
@@ -359,7 +359,7 @@ public class OperationResultAppendErrorsTests
     public void AppendErrors_EmptySource_DoesNotAffectTarget()
     {
         // Arrange
-        var source = new OperationResult(); // No errors
+        var source = new OperationResult<double>();
         var target = new OperationResult<string>();
         target.AppendError("Target error", 1);
 
@@ -376,7 +376,7 @@ public class OperationResultAppendErrorsTests
     public void AppendErrors_EmptyTarget_AcceptsSourceErrors()
     {
         // Arrange
-        var source = new OperationResult();
+        var source = new OperationResult<object>();
         source.AppendError("Source error", 100);
 
         var target = new OperationResult<string>();
@@ -443,7 +443,7 @@ public class OperationResultAppendErrorsTests
         };
 
         var target = new OperationResult<Dictionary<string, List<int>>>(complexObject);
-        var source = new OperationResult();
+        var source = new OperationResult<int>();
         source.AppendError("Complex type error", 999);
 
         // Act
@@ -460,7 +460,7 @@ public class OperationResultAppendErrorsTests
     {
         // Arrange
         var target = new OperationResult<int> { ResultObject = 100 };
-        var source1 = new OperationResult();
+        var source1 = new OperationResult<double>();
         source1.AppendError("E1", 1);
 
         // Act
@@ -474,5 +474,21 @@ public class OperationResultAppendErrorsTests
         Assert.IsType<OperationResult<int>>(step3);
         Assert.Same(target, step3);
         Assert.Equal(3, target.Errors.Count);
+    }
+
+    [Fact]
+    public void AppendErrors_GenericTarget_ShouldLogWhenCreatedWithALogger()
+    {
+        // Arrange
+        var testLogger = new TestLogger();
+        var operationResultNoLogger = new OperationResult();
+        var operationResultWithLogger = new OperationResult<string>(testLogger);
+
+        // Act
+        operationResultNoLogger.AppendError("test");
+        operationResultWithLogger.AppendErrors(operationResultNoLogger);
+
+        // Assert
+        Assert.Single(testLogger.LogMessages);
     }
 }
